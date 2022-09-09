@@ -1,14 +1,6 @@
-import projectFactory from "./Project";
+import manager from "./Manager";
 import {main, displayProject} from "./UI";
 
 main();
-
-let project = projectFactory();
-
-project.newTask();
-
-console.log(project.tasks[0]);
-
-displayProject(project);
 
 
