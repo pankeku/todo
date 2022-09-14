@@ -1,40 +1,54 @@
 import taskFactory from './Task';
+import { generateId } from './helper';
+import projects from './Manager';
 
-export default function projectFactory() {
-
-  let name = '';
+function createProject() {
+  let title = 'PROJECT TITLE';
   let tasks = [];
 
-  function newTask() {  
-    return taskFactory();
-  }
-
   return {
-
-    get name() {
-      return name;
+    get title() {
+      return title;
     },
 
-    set name(value) {
-      name = value;
+    set title(value) {
+      title = value;
     },
 
     get tasks() {
       return tasks;
     },
-    
-    add: function() {  
-      const task = newTask();
-          
-      this.tasks.push(task);
+
+    add: function (task) {
+      tasks.push(task);
     },
-    remove: function(task) {
-      const index = array.indexOf(task);
-      if (index < -1) {
-        this.tasks.splice(index, 1);
+
+    remove: function (index) {
+      if (index > -1) {
+        tasks.splice(index, 1);
       }
     },
   };
 }
 
+function addTask(project, task) {
+  project.add(task);
+}
 
+function removeTask(project, task) {
+  let index = locateIndex(project, task);
+  project.remove(index);
+}
+
+function editTask(project, task) {}
+
+function locateIndex(project, task) {
+  const index = project.tasks.indexOf(task);
+  if (index > -1) {
+    return index;
+  }
+
+  return null;
+}
+
+export { createProject, addTask, removeTask};

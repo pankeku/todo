@@ -1,24 +1,17 @@
-import projectFactory from './Project';
+import {createProject, addTask} from './Project';
 
-export default function manager() {
-  const projects = [];
+let projects = [];
 
-  function newProject() {
-    return projectFactory();
-  }
+function newProject() {
+  let project = createProject();
+  projects.push(project);
 
-  return {
-
-    get projects() {
-      return projects;
-    },
-
-    new: function () {
-      const project = newProject();
-
-      projects.push(project);
-
-      return project;
-    },
-  };
+  return project;
 }
+
+function iterate(fun) {
+  projects.forEach(fun);
+}
+
+
+export {projects, newProject, iterate};

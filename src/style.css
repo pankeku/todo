@@ -1,0 +1,63 @@
+
+body {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 300;
+    font-size: 15px;
+    margin: 0px;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+}
+
+.content {
+    padding: 20px;
+}
+
+.notes-container {
+   display: grid;
+   grid-template-columns: 1fr 10fr;
+}
+
+.nav {
+    min-width: 100px;
+    height: 100vh;
+    background-color: coral;
+}
+
+.header {
+    height: 40px;
+    background-color: black;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+
+.header-text {
+
+    margin-left: 20px;
+    color: white;
+
+}
+
+.projects {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+}
+
+.project {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.project-title {
+    font-size: 1.3rem;
+}
+
+.task {
+    border: 1px solid black;
+    padding: 10px;
+}
