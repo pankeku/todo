@@ -1,9 +1,6 @@
-import taskFactory from './Task';
-import { generateId } from './helper';
-import projects from './Manager';
-
-function createProject() {
-  let title = 'PROJECT TITLE';
+function createProject(name = 'Project title') {
+  let title = name;
+  let id;
   let tasks = [];
 
   return {
@@ -15,8 +12,21 @@ function createProject() {
       title = value;
     },
 
+    set id(value) {
+      id = value;
+    },
+
+    get id() {
+      return id;
+    }
+    ,
+
     get tasks() {
       return tasks;
+    },
+
+    set tasks(value) {
+      tasks = value;
     },
 
     add: function (task) {

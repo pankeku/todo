@@ -1,121 +1,50 @@
-import { iterate, projects as projectsArray } from './Manager';
-import config from './config';
-import load from './page';
+import { render as renderNav} from './ui-modules/nav';
+import { displayProject, render as renderContent } from './ui-modules/content';
+import {render as renderHeader} from './ui-modules/header';
 
+
+const mainContainer = createHtmlElement('div', null, ['main-container'], null, null);
+const header = renderHeader();
+const container = createHtmlElement('div', null, ['container'], null, null);
+const content = renderContent();
+
+
+function display(project) {
+displayProject(project);
+
+}
 
 
 function main() {
-  
-  let content = load();
-content.appendChild(createProjects());
+  const nav = renderNav();
+
+  document.body.appendChild(mainContainer);
+  mainContainer.append(header, container);
+  container.append(nav, content);
 }
 
 
-//ar geriau projectGenerator injectint sitaip, ar tiesiog pacallint projectGenerator() methodo viduj, pvz. projects.forEach(projectGenerator())? jei injectinu, createProjects tampa daugiau loosely coupled nuo projectGenerator? Is kitos puses, vis tiek callindamas createProjects turesiu norodyt projectGenerator kaip argument, bet cia gaunasi, kad createProjects panaudojimas tampa universalesnis, nes galiu injectint ka noriu?
-//ir dar, createProjects ir projectsArray siuo atveju yra tightly coupled? irgi reiktu injectint? ar importinimas moduly jau skaitosi kaip injectinimas?
+function createHtmlElement(type, id, arrayClasses, content, editable) {
+  const element = document.createElement(type);
+  if (id) element.id = id;
+  if (arrayClasses)
+    arrayClasses.forEach((myClass) => element.classList.add(myClass));
 
-function createProjects() {
-  const projectsElement = document.createElement('div');
-  projectsElement.classList.add('projects');
+  if (content) element.textContent = content;
 
-  projectsArray.forEach((project) => {
-    let projectElement = projectGenerator();
+  if (editable) makeEditable(element, content);
 
-    generateText(project, projectElement);
-
-    let tasksElement = createTasks(project);
-
-    projectElement.append(tasksElement);
-    projectsElement.append(projectElement);
-
-    makeEditable(project, projectElement);
-  });
-
-  return projectsElement;
+  return element;
 }
 
-function projectGenerator() {
-  const projectElement = document.createElement('div');
-  projectElement.classList.add('project');
+function makeEditable(element, content) {
+  element.contentEditable = true;
 
-  const projectTitle = document.createElement('div');
-  projectTitle.classList.add('project-title');
-
-  projectElement.appendChild(projectTitle);
-
-  return projectElement;
-}
-
-function createTasks(project) {
-  console.log(project);
-  const taskList = project.tasks;
-
-  const tasksElement = document.createElement('div');
-  tasksElement.classList.add('tasks');
-
-  taskList.forEach((task) => {
-    let element = taskGenerator(task);
-    generateText(task, element);
-    tasksElement.append(element);
-    makeEditable(task, element);
-  });
-
-  return tasksElement;
-}
-
-function taskGenerator(task) {
-  const taskElement = document.createElement('div');
-  taskElement.classList.add('task');
-
-  const title = document.createElement('div');
-  title.classList.add('task-title');
-
-  title.addEventListener('keyup', () => {
-    task.title = title.textContent;
-    console.log(task.title);
-  });
-
-  const description = document.createElement('div');
-  description.classList.add('description');
-
-  const priority = document.createElement('div');
-  priority.classList.add('priority');
-
-  const dueDate = document.createElement('div');
-  dueDate.classList.add('due-date');
-
-  taskElement.append(title, description, priority, dueDate);
-
-  return taskElement;
-}
-
-function makeEditable(object, element) {
-  element.childNodes.forEach((child) => {
-    for (let item in config.editables) {
-      if (item === child.classList[0]) {
-        child.contentEditable = true;
-
-        child.addEventListener('keyup', () => {
-          object.title = child.textContent;
-          console.log(object.title);
-        });
-      }
-    }
+  element.addEventListener('keyup', () => {
+    content = element.textContent;
   });
 }
-
-function generateText(object, element) {
-  element.childNodes.forEach((child) => {
-    for (let item in config.text) {
-      if (item === child.classList[0]) {
-        child.textContent = object[config.text[item]];
-      }
-    }
-  });
-}
-
-
 
 function update() {}
 
-export { main, update };
+export { main, update, display, container, createHtmlElement, makeEditable};

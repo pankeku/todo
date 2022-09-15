@@ -6,9 +6,47 @@ body {
     margin: 0px;
 }
 
-.container {
+.main-container {
     display: flex;
     flex-direction: column;
+}
+
+.task-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 10px;
+    width: 400px;
+    height: 50px;
+    overflow:hidden;
+  
+  transition: all .3s ease;
+}
+
+.text-bar {
+    height: 100%;
+    padding: 5px;
+}
+
+.task-container--expand {
+    height: 100px;
+}
+
+.task-footer {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+}
+
+.task-close { 
+
+
+}
+
+.container {
+    display: flex;
 }
 
 .content {
