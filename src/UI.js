@@ -1,26 +1,34 @@
 import { render as renderNav} from './ui-modules/nav';
 import { displayProject, render as renderContent } from './ui-modules/content';
 import {render as renderHeader} from './ui-modules/header';
+import loadListeners from './listeners';
 
+let activeProject = [];
 
 const mainContainer = createHtmlElement('div', null, ['main-container'], null, null);
 const header = renderHeader();
 const container = createHtmlElement('div', null, ['container'], null, null);
-const content = renderContent();
+let content = renderContent();
 
 
 function display(project) {
+  activeProject = project;
 displayProject(project);
+loadListeners()
 
 }
 
 
 function main() {
-  const nav = renderNav();
+  
 
   document.body.appendChild(mainContainer);
   mainContainer.append(header, container);
-  container.append(nav, content);
+  
+  const nav = renderNav();
+  container.append(nav);
+  container.append(content);
+  
 }
 
 
@@ -38,13 +46,28 @@ function createHtmlElement(type, id, arrayClasses, content, editable) {
 }
 
 function makeEditable(element, content) {
-  element.contentEditable = true;
+
+  /* element.addEventListener('click', () => {
+    element.contentEditable = true;
+  })
+
+  document.body.addEventListener('click', (event) => {
+    event.stopPropagation()
+    //element.contentEditable = false;
+  }) */
+  
 
   element.addEventListener('keyup', () => {
     content = element.textContent;
+    console.log(content);
   });
 }
 
-function update() {}
+function update() {
+  display(activeProject);
+  loadListeners();
+
+  
+}
 
 export { main, update, display, container, createHtmlElement, makeEditable};

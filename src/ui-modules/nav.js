@@ -11,6 +11,7 @@ function generateNavItems() {
   let navItems = createHtmlElement('div', null, ['nav-items'], null, null);
   let items = getProjectsTitles();
   let map = new Map();
+
   items.forEach((object, title) => {
     const element = createHtmlElement('ul', null, ['nav-item'], title, null);
     navItems.appendChild(element);

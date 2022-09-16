@@ -1,3 +1,4 @@
+import { getProjectIndex } from '../Manager';
 import { createHtmlElement, makeEditable } from '../UI';
 
 const content = createHtmlElement('div', null, ['content'], null, null);
@@ -18,7 +19,13 @@ function task() {
   );
 
   const textBar = createHtmlElement('div', null, ['text-bar'], null, true);
-  const taskFooter = createHtmlElement('div', null, ['task-footer'], null, null);
+  const taskFooter = createHtmlElement(
+    'div',
+    null,
+    ['task-footer'],
+    null,
+    null
+  );
 
   newTaskContainer.appendChild(textBar);
   newTaskContainer.appendChild(taskFooter);
@@ -26,7 +33,6 @@ function task() {
 
   newTaskContainer.addEventListener('click', () => {
     newTaskContainer.classList.toggle('task-container--expand');
-    
   });
 
   content.append(newTaskContainer);
@@ -44,13 +50,14 @@ function clear() {
     child = content.firstChild;
   }
 
-  task();
+ // task();
 }
 
 function displayProject(project) {
   clear();
 
   let element = projectGenerator(project);
+  console.log(project.tasks)
 
   element.appendChild(createTasks(project));
 
@@ -88,10 +95,25 @@ function createTasks(project) {
 
   taskList.forEach((task) => {
     let element = taskGenerator(task);
+
+    element.id = getProjectIndex(task.project) + '-' + task.id;
+
+    addRemoveButton(element);
+
     tasksElement.append(element);
+
+    element.addEventListener('click', () => {});
   });
 
   return tasksElement;
+}
+
+function addRemoveButton(element) {
+  const remove = document.createElement('div');
+  remove.classList.add('remove');
+  remove.textContent = 'Remove';
+
+  element.appendChild(remove);
 }
 
 function taskGenerator(task) {
@@ -105,12 +127,28 @@ function taskGenerator(task) {
     true
   );
 
+  const titleInput = createHtmlElement(
+    'input',
+    null,
+    ['task-input', 'task-title--hidden'],
+    task.title,
+    null
+  );
+
   const description = createHtmlElement(
     'div',
     null,
     ['description'],
     task.description,
     true
+  );
+
+  const descriptionInput = createHtmlElement(
+    'input',
+    null,
+    ['description-input', 'task-title--hidden'],
+    task.description,
+    null
   );
 
   const priority = createHtmlElement(
@@ -129,7 +167,14 @@ function taskGenerator(task) {
     null
   );
 
-  taskElement.append(title, description, priority, dueDate);
+  taskElement.append(
+    title,
+    titleInput,
+    description,
+    descriptionInput,
+    priority,
+    dueDate
+  );
 
   return taskElement;
 }

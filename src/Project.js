@@ -1,6 +1,8 @@
+let number = 0;
+
 function createProject(name = 'Project title') {
   let title = name;
-  let id;
+  let id = number++;
   let tasks = [];
 
   return {
@@ -35,30 +37,19 @@ function createProject(name = 'Project title') {
 
     remove: function (index) {
       if (index > -1) {
-        tasks.splice(index, 1);
+        return tasks.splice(index, 1);
       }
     },
   };
 }
 
 function addTask(project, task) {
+  task.project = project;
   project.add(task);
-}
-
-function removeTask(project, task) {
-  let index = locateIndex(project, task);
-  project.remove(index);
 }
 
 function editTask(project, task) {}
 
-function locateIndex(project, task) {
-  const index = project.tasks.indexOf(task);
-  if (index > -1) {
-    return index;
-  }
 
-  return null;
-}
 
-export { createProject, addTask, removeTask};
+export { createProject, addTask};
