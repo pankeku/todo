@@ -7,6 +7,7 @@ let initialProject;
 function init() {
   defaultProject();
   main();
+  display(initialProject);
 }
 
 function defaultProject() {
@@ -18,17 +19,31 @@ function updateTasks() {
   initialProject.tasks = getAllTasks();
 }
 
-function removeTask(projectIndex, taskId) {
-  let project = projects[projectIndex];
-  let task = project.tasks.findIndex((item) => item.id === taskId);
+function removeTask(id) {
+  let task = getTaskById(id);
 
-  console.log('DELETED: ' + project.remove(task));
+  task.project.remove(getTaskIndex(task));
 
   updateTasks();
   update();
 }
 
-function locateIndex(task) {
+function getTaskById(id) {
+  let found;
+  projects.forEach(
+    (project) => (found = project.tasks.find((task) => task.id === id))
+  );
+  console.log(found);
+  return found;
+}
+
+function locateProject(projectIndex) {
+  let project = projects[projectIndex];
+
+  return project;
+}
+
+function getTaskIndex(task) {
   const project = task.project;
   const index = project.tasks.indexOf(task);
   if (index > -1) {
@@ -78,4 +93,5 @@ export {
   getProjectsAndTitles as getProjectsTitles,
   removeTask,
   getProjectIndex,
+  getTaskById,
 };

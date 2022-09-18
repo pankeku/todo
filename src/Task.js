@@ -1,10 +1,16 @@
 let number = 0;
 
-export default function createTask(title, description, dueDate, priority) {  
+export default function createTask(title1, description, dueDate, priority) {  
   let project;
   let id = number++;
+  let title = title1;
   return {
-    title,
+    get title() {
+      return title;
+    },
+    set title(value) { 
+      title = value;
+    },
     description,
     dueDate,
     priority,

@@ -1,7 +1,7 @@
 import { getProjectIndex } from '../Manager';
 import { createHtmlElement, makeEditable } from '../UI';
 
-const content = createHtmlElement('div', null, ['content'], null, null);
+const content = createHtmlElement('div', null, ['content'], null);
 
 function render() {
   return content;
@@ -14,16 +14,14 @@ function task() {
     'div',
     null,
     ['task-container'],
-    null,
     null
   );
 
-  const textBar = createHtmlElement('div', null, ['text-bar'], null, true);
+  const textBar = createHtmlElement('div', null, ['text-bar'], null);
   const taskFooter = createHtmlElement(
     'div',
     null,
     ['task-footer'],
-    null,
     null
   );
 
@@ -39,7 +37,7 @@ function task() {
 }
 
 function taskContent() {
-  const close = createHtmlElement('div', null, ['task-close'], 'Close', null);
+  const close = createHtmlElement('div', null, ['task-close'], 'Close');
   return close;
 }
 
@@ -50,14 +48,13 @@ function clear() {
     child = content.firstChild;
   }
 
- // task();
+  // task();
 }
 
 function displayProject(project) {
   clear();
 
   let element = projectGenerator(project);
-  console.log(project.tasks)
 
   element.appendChild(createTasks(project));
 
@@ -71,15 +68,13 @@ function projectGenerator(project) {
     'div',
     null,
     ['project'],
-    null,
     null
   );
   const projectTitle = createHtmlElement(
     'div',
     null,
     ['project-title'],
-    project.title,
-    true
+    project.title
   );
 
   projectElement.appendChild(projectTitle);
@@ -95,10 +90,6 @@ function createTasks(project) {
 
   taskList.forEach((task) => {
     let element = taskGenerator(task);
-
-    element.id = getProjectIndex(task.project) + '-' + task.id;
-
-    addRemoveButton(element);
 
     tasksElement.append(element);
 
@@ -116,39 +107,43 @@ function addRemoveButton(element) {
   element.appendChild(remove);
 }
 
-function taskGenerator(task) {
-  const taskElement = createHtmlElement('div', null, ['task'], null, null);
+function addEditButton(element) {
+  const edit = document.createElement('div');
+  edit.classList.add('edit');
+  edit.textContent = 'Edit';
+
+  element.appendChild(edit);
+}
+
+function taskGenerator(task, setting) {
+  const taskElement = createHtmlElement('div', null, ['task'], null);
+  taskElement.id = task.id;
+
+  let type = 'div';
+  let attributes = [[], []];
+
+  if (setting) {
+    type = 'input';
+    attributes = [
+      ['value', task.title],
+      ['value', task.description],
+    ];
+  }
 
   const title = createHtmlElement(
-    'div',
+    type,
     null,
     ['task-title'],
     task.title,
-    true
-  );
-
-  const titleInput = createHtmlElement(
-    'input',
-    null,
-    ['task-input', 'task-title--hidden'],
-    task.title,
-    null
+    attributes[0]
   );
 
   const description = createHtmlElement(
-    'div',
+    type,
     null,
     ['description'],
     task.description,
-    true
-  );
-
-  const descriptionInput = createHtmlElement(
-    'input',
-    null,
-    ['description-input', 'task-title--hidden'],
-    task.description,
-    null
+    attributes[1]
   );
 
   const priority = createHtmlElement(
@@ -156,27 +151,23 @@ function taskGenerator(task) {
     null,
     ['priority'],
     task.priority,
-    null
   );
 
   const dueDate = createHtmlElement(
     'div',
     null,
     ['due-date'],
-    task.dueDate,
-    null
+    task.dueDate
   );
 
-  taskElement.append(
-    title,
-    titleInput,
-    description,
-    descriptionInput,
-    priority,
-    dueDate
-  );
+  taskElement.append(title, description, priority, dueDate);
+
+  if (!setting) {
+    addEditButton(taskElement);
+    addRemoveButton(taskElement);
+  }
 
   return taskElement;
 }
 
-export { render, displayProject };
+export { render, displayProject, taskGenerator };

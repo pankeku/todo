@@ -3,7 +3,7 @@ import { createHtmlElement, display } from '../UI';
 
 function render() {
   const nav = createHtmlElement('div', null, ['nav'], null, null);
-  nav.appendChild(generateNavItems());
+  nav.append(generateNavItems(), addProjectButton());
   return nav;
 }
 
@@ -29,6 +29,11 @@ function events(map) {
         });
     });
     
+}
+
+function addProjectButton() {
+  const element = createHtmlElement('div', null, ['project-add'], 'Add Project', null);
+  return element;
 }
 
 export { render };
