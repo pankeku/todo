@@ -1,4 +1,5 @@
-import { createProject } from './Project';
+import { createProject, addTask } from './Project';
+import createTask from './Task';
 import { display, main, update } from './UI';
 
 let projects = [];
@@ -13,16 +14,30 @@ function init() {
 function defaultProject() {
   initialProject = newProject('All');
   initialProject.tasks = getAllTasks();
+  //initialProject.id = -9;
 }
 
 function updateTasks() {
   initialProject.tasks = getAllTasks();
 }
 
+
+function addNewTask(projectId, title1, description, dueDate, priority) {
+  let project = getProjectById(projectId);
+  if (project.title = 'All') {
+    project = initialProject;
+  }
+  addTask(project, createTask(title1, description, dueDate, priority));
+  console.log(project);
+}
+
 function removeTask(id) {
+  console.log('removing')
   let task = getTaskById(id);
 
   task.project.remove(getTaskIndex(task));
+
+  console.log(task.project);
 
   updateTasks();
   update();
@@ -33,7 +48,6 @@ function getTaskById(id) {
   projects.forEach(
     (project) => (found = project.tasks.find((task) => task.id === id))
   );
-  console.log(found);
   return found;
 }
 
@@ -52,10 +66,19 @@ function getTaskIndex(task) {
   return null;
 }
 
+function getProjectById(id) {
+  console.log(projects[0].id);
+ const project = projects.find(item => item.id === Number(id));
+ console.log(project);
+ return project;
+}
+
 function getAllTasks() {
   let array = [];
   projects.forEach((project) => {
-    if (project.title === 'All') return;
+    if (project.title === 'All') {
+
+    };
     array = array.concat(project.tasks);
   });
   return array;
@@ -67,9 +90,11 @@ function getProjectIndex(project) {
 }
 
 function getProjectsAndTitles() {
-  let titles = new Map();
+  let titles = [];
   projects.forEach((project) => {
-    titles.set(project.title, project);
+    const obj = {};
+    obj[project.title] = project;
+    titles.push(obj);
   });
   return titles;
 }
@@ -77,6 +102,7 @@ function getProjectsAndTitles() {
 function newProject(title) {
   let project = createProject(title);
   projects.push(project);
+  console.log(project.title + ' ' + project.id);
 
   return project;
 }
@@ -94,4 +120,5 @@ export {
   removeTask,
   getProjectIndex,
   getTaskById,
+  addNewTask
 };

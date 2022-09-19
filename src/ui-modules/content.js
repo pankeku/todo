@@ -7,8 +7,6 @@ function render() {
   return content;
 }
 
-task();
-
 function task() {
   const newTaskContainer = createHtmlElement(
     'div',
@@ -17,23 +15,40 @@ function task() {
     null
   );
 
-  const textBar = createHtmlElement('div', null, ['text-bar'], null);
-  const taskFooter = createHtmlElement(
+  const container = createHtmlElement(
     'div',
     null,
-    ['task-footer'],
+    ['task-inside-container'],
     null
   );
 
-  newTaskContainer.appendChild(textBar);
-  newTaskContainer.appendChild(taskFooter);
+  const textBar = createHtmlElement('input', null, ['text-bar'], null, ['placeholder', 'New todo...']);
+  
+
+  
+
+  newTaskContainer.append(container);
+  container.appendChild(textBar);
+
+
+  return newTaskContainer;
+}
+
+function handler() {
+  let taskContainer = document.querySelector('.task-container');
+  let container = document.querySelector('.task-inside-container');
+  const description = createHtmlElement('input', null, ['new-description'], null, ['placeholder', 'Description']);
+  const taskFooter = createHtmlElement('div', null, ['task-footer'], null);
+
+ taskContainer.classList.add('task-container--expand');
+
+
+ if (container.lastChild === document.querySelector('.text-bar')) {
+  container.append(description);
+  container.appendChild(taskFooter);
   taskFooter.appendChild(taskContent());
-
-  newTaskContainer.addEventListener('click', () => {
-    newTaskContainer.classList.toggle('task-container--expand');
-  });
-
-  content.append(newTaskContainer);
+ }
+ 
 }
 
 function taskContent() {
@@ -42,19 +57,15 @@ function taskContent() {
 }
 
 function clear() {
-  let child = content.firstChild;
-  while (child) {
-    content.removeChild(child);
-    child = content.firstChild;
-  }
-
-  // task();
+  content.replaceChildren();
 }
 
 function displayProject(project) {
   clear();
 
   let element = projectGenerator(project);
+
+  element.append(task());
 
   element.appendChild(createTasks(project));
 
@@ -64,12 +75,7 @@ function displayProject(project) {
 }
 
 function projectGenerator(project) {
-  const projectElement = createHtmlElement(
-    'div',
-    null,
-    ['project'],
-    null
-  );
+  const projectElement = createHtmlElement('div', project.id, ['project'], null);
   const projectTitle = createHtmlElement(
     'div',
     null,
@@ -146,19 +152,9 @@ function taskGenerator(task, setting) {
     attributes[1]
   );
 
-  const priority = createHtmlElement(
-    'div',
-    null,
-    ['priority'],
-    task.priority,
-  );
+  const priority = createHtmlElement('div', null, ['priority'], task.priority);
 
-  const dueDate = createHtmlElement(
-    'div',
-    null,
-    ['due-date'],
-    task.dueDate
-  );
+  const dueDate = createHtmlElement('div', null, ['due-date'], task.dueDate);
 
   taskElement.append(title, description, priority, dueDate);
 
@@ -170,4 +166,4 @@ function taskGenerator(task, setting) {
   return taskElement;
 }
 
-export { render, displayProject, taskGenerator };
+export { render, displayProject, taskGenerator, handler };

@@ -14,8 +14,9 @@ let content = renderContent();
 function display(project) {
   activeProject = project;
   displayProject(project);
-  loadListeners();
 }
+
+
 
 function main() {
   document.body.appendChild(mainContainer);
