@@ -1,53 +1,97 @@
-import { createProject, addTask } from './Project';
-import createTask from './Task';
-import { display, main, update } from './UI';
+import { createProject, addTask } from "./Project";
+import createTask from "./Task";
+import { display, main, update } from "./UI";
 
 let projects = [];
-let initialProject;
+let homeProject;
+let done;
+
+function getDoneList() {
+  return done;
+}
+
+function toggleTaskCompletion(task) {
+  console.log(task);
+  if (task.completed) {
+
+    done.remove(done.tasks.indexOf(task));
+    task.completed = false;
+    task.project.add(task);
+    console.log(task.project);
+
+
+    updateTasks();
+    update();
+
+    return;
+  }
+  task.completed = true;
+  done.add(task);
+  removeTask(task.id);
+  console.log(task)
+  console.log(done.tasks);
+  updateTasks();
+  update();
+}
 
 function init() {
+  createDoneTasksProject();
   defaultProject();
   main();
-  display(initialProject);
+  display(homeProject);
+}
+
+function createDoneTasksProject() {
+  done = createProject("Done");
+  done.id = -2;
+}
+
+function getHomeProject() {
+  return homeProject;
 }
 
 function defaultProject() {
-  initialProject = newProject('All');
-  initialProject.tasks = getAllTasks();
-  //initialProject.id = -9;
+  homeProject = newProject("Home");
+  homeProject.id = -1;
+  updateTasks();
 }
 
 function updateTasks() {
-  initialProject.tasks = getAllTasks();
+  homeProject.tasks = homeProject.tasks.filter(
+    (task) => task.project.title === homeProject.title
+  );
+  homeProject.tasks = homeProject.tasks.concat(getAllTasks());
 }
 
+function addNewTask(projectId, title, description, dueDate, priority) {
+  let project = getProjectById(Number(projectId));
 
-function addNewTask(projectId, title1, description, dueDate, priority) {
-  let project = getProjectById(projectId);
-  if (project.title = 'All') {
-    project = initialProject;
-  }
-  addTask(project, createTask(title1, description, dueDate, priority));
-  console.log(project);
-}
-
-function removeTask(id) {
-  console.log('removing')
-  let task = getTaskById(id);
-
-  task.project.remove(getTaskIndex(task));
-
-  console.log(task.project);
+  addTask(project, createTask(title, description, dueDate, priority));
 
   updateTasks();
   update();
 }
 
-function getTaskById(id) {
+function removeTask(id) {
+  let task = getTaskById(id);
+
+  task.project.remove(getTaskIndex(task));
+
+  updateTasks();
+  update();
+}
+
+function getTaskById(id, project) {
+  id = Number(id);
+
+  if (project) {
+    return project.tasks.find((task) => task.id === id);
+  }
+
   let found;
-  projects.forEach(
-    (project) => (found = project.tasks.find((task) => task.id === id))
-  );
+  projects.forEach((project) => {
+    found = project.tasks.find((task) => task.id === id);
+  });
   return found;
 }
 
@@ -67,20 +111,21 @@ function getTaskIndex(task) {
 }
 
 function getProjectById(id) {
-  console.log(projects[0].id);
- const project = projects.find(item => item.id === Number(id));
- console.log(project);
- return project;
+  id = Number(id);
+
+  if (id === -1) return getHomeProject();
+
+  const project = projects.find((project) => project.id === id);
+  return project;
 }
 
 function getAllTasks() {
   let array = [];
-  projects.forEach((project) => {
-    if (project.title === 'All') {
-
-    };
-    array = array.concat(project.tasks);
-  });
+  projects
+    .filter((project) => project.title !== homeProject.title)
+    .forEach((project) => {
+      array = array.concat(project.tasks);
+    });
   return array;
 }
 
@@ -91,18 +136,19 @@ function getProjectIndex(project) {
 
 function getProjectsAndTitles() {
   let titles = [];
-  projects.forEach((project) => {
-    const obj = {};
-    obj[project.title] = project;
-    titles.push(obj);
-  });
+  projects
+    .filter((project) => project.title !== homeProject.title)
+    .forEach((project) => {
+      const obj = {};
+      obj[project.title] = project.id;
+      titles.push(obj);
+    });
   return titles;
 }
 
 function newProject(title) {
   let project = createProject(title);
   projects.push(project);
-  console.log(project.title + ' ' + project.id);
 
   return project;
 }
@@ -120,5 +166,9 @@ export {
   removeTask,
   getProjectIndex,
   getTaskById,
-  addNewTask
+  addNewTask,
+  getHomeProject,
+  getProjectById,
+  getDoneList,
+  toggleTaskCompletion
 };

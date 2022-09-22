@@ -10,19 +10,33 @@ body {
 }
 
 .task-container {
+  display: flex;
+  flex-direction: column;
     box-sizing: border-box;
     box-shadow: 0 2px 6px 2px rgba(60,64,67,0.149);
   border-radius: 5px;
   padding: 10px;
-  width: 400px;
+  width: 100%;
   height: 40px;
   overflow: hidden;
   transition: all 0.3s ease;
 }
 
 .task-inside-container {
+  flex: 1;
     display: flex;
-    flex-direction: column;
+}
+
+.newtask-left-wrapper {
+  display: flex;
+  width: 80%;
+  flex-direction: column;
+}
+
+.newtask-right-wrapper {
+  flex: 1;
+  display:flex;
+  flex-direction: column;
 }
 
 .text-bar {
@@ -43,7 +57,7 @@ input:focus {
   height: 100px;
 }
 
-.task-footer {
+.newtask-footer {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -102,10 +116,33 @@ input:focus {
 }
 
 .task {
+  display: flex;
   padding: 10px;
+}
+
+.task:hover {
+  background-color: aquamarine;
+}
+
+.task-title {
+  width: 100%;
+}
+
+.task-actions-wrapper {
+  display: none;
+}
+
+.task:hover .task-actions-wrapper {
+  display: flex;
+  gap: 5px;
+
+}
+
+.task--expanded {
   display: grid;
   grid-template-columns: 1fr 1fr 100px 100px;
   grid-template-rows: 1fr 1fr;
+
 }
 
 .task--expand {

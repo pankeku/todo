@@ -1,22 +1,20 @@
-import { render as renderNav } from './ui-modules/nav';
-import { displayProject, render as renderContent } from './ui-modules/content';
-import { render as renderHeader } from './ui-modules/header';
-import loadListeners from './listeners';
-import { projects } from './Manager';
+import { render as renderNav } from "./ui-modules/nav";
+import { displayProject, render as renderContent } from "./ui-modules/content";
+import { render as renderHeader } from "./ui-modules/header";
+import loadListeners from "./listeners";
+import { projects } from "./Manager";
 
 let activeProject = [];
 
-const mainContainer = createHtmlElement('div', null, ['main-container'], null);
+const mainContainer = createHtmlElement("div", null, ["main-container"], null);
 const header = renderHeader();
-const container = createHtmlElement('div', null, ['container'], null);
+const container = createHtmlElement("div", null, ["container"], null);
 let content = renderContent();
 
 function display(project) {
   activeProject = project;
   displayProject(project);
 }
-
-
 
 function main() {
   document.body.appendChild(mainContainer);
@@ -29,7 +27,9 @@ function main() {
 
 function createHtmlElement(type, id, arrayClasses, content, attributes) {
   const element = document.createElement(type);
-  if (id) element.id = id;
+  if (id) {
+    element.id = id;
+  }
   if (arrayClasses)
     arrayClasses.forEach((myClass) => element.classList.add(myClass));
 
@@ -48,4 +48,4 @@ function update() {
   display(activeProject);
 }
 
-export { main, update, display, container, createHtmlElement};
+export { main, update, display, container, createHtmlElement };

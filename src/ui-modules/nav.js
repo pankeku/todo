@@ -1,35 +1,44 @@
-import { getProjectsTitles } from '../Manager';
+import { getDoneList, getHomeProject, getProjectsTitles } from '../Manager';
 import { createHtmlElement, display } from '../UI';
 
 const nav = createHtmlElement('div', null, ['nav'], null, null);
 
 function render() {
-  nav.append(generateNavItems(), addProjectButton());
+  nav.append(generateHomeItem(), generateNavItems(), addProjectButton(), generateDoneTasksProj());
   return nav;
+}
+
+function generateDoneTasksProj() {
+  const doneProject = getDoneList();
+  const done = createHtmlElement('div', doneProject.id, ['done-tasks'], doneProject.title, null);
+
+  return done;
+}
+
+function generateHomeItem() {
+  const homeProject = getHomeProject();
+  const home = createHtmlElement('div', homeProject.id, ['nav-home'], homeProject.title, null);
+
+  return home;
+
 }
 
 function generateNavItems() {
   let navItems = createHtmlElement('div', null, ['nav-items'], null, null);
   let items = getProjectsTitles();
-  console.log(items);
-  let map = new Map();
-
   items.forEach((item) => {
     for (let key in item) {
-      const element = createHtmlElement('ul', null, ['nav-item'], key, null);
+      const element = createHtmlElement('ul', item[key], ['nav-item'], key, null);
       navItems.appendChild(element);
-
-      map.set(element, item[key]);
     }
   });
 
-  events(map);
   return navItems;
 }
 
 function updateNav() {
   nav.replaceChildren();
-  nav.append(generateNavItems(), addProjectButton());
+  render();
 }
 
 function events(map) {
