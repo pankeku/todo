@@ -1,5 +1,7 @@
 import { getProjectIndex } from "../Manager";
 import { createHtmlElement, makeEditable } from "../UI";
+import isToday from "date-fns/isToday";
+import { parseISO, formatDistanceToNow, isBefore } from "date-fns";
 
 const content = createHtmlElement("div", null, ["content"], null);
 
@@ -23,14 +25,38 @@ function task() {
   );
 
   const textBar = createHtmlElement("input", null, ["text-bar"], null, [
-    "placeholder",
-    "New todo...",
+    ["placeholder", "New todo..."],
   ]);
 
   newTaskContainer.append(container);
   container.appendChild(textBar);
 
   return newTaskContainer;
+}
+
+function createDateInput(date) {
+  if (!date) date = "Set date";
+
+  const newDate = createHtmlElement("input", null, ["newtask-date"], "Date", [
+    ["type", "text"],
+    ["value", date],
+  ]);
+  return newDate;
+}
+
+function dueDateChecker(date) {
+  date = parseISO(date);
+
+  if (date == 'Invalid Date') return;
+  ;
+
+  let result = formatDistanceToNow(date);
+
+  let status = isBefore(date, new Date())
+    ? `${result} overdue`
+    : `due in ${result}`;
+
+  return status;
 }
 
 function handler() {
@@ -41,7 +67,7 @@ function handler() {
     null,
     ["new-description"],
     null,
-    ["placeholder", "Description"]
+    [["placeholder", "Description"]]
   );
   const taskFooter = createHtmlElement("div", null, ["newtask-footer"], null);
 
@@ -64,9 +90,11 @@ function handler() {
     ["newtask-priority"],
     "Priority"
   );
-  const newDate = createHtmlElement("div", null, ["newtask-date"], "Date");
 
-  rightWrapper.append(newDate, newPriority);
+  const dateWrapper = createHtmlElement("div", null, ["newtask-date-wrapper"]);
+
+  dateWrapper.append(createDateInput());
+  rightWrapper.append(dateWrapper, newPriority);
 
   taskContainer.classList.add("task-container--expand");
 
@@ -166,37 +194,32 @@ function expandTask(task, taskElement, expand) {
 }
 
 function addCheckBox(task, taskElement) {
-  const checkbox = createHtmlElement('input', null, ['complete'], null, ['type', 'checkbox']);
+  const checkbox = createHtmlElement("input", null, ["complete"], null, [
+    ["type", "checkbox"],
+  ]);
   taskElement.append(checkbox);
   checkbox.checked = task.completed;
-
-
 }
 
 function taskGenerator(task, setting) {
-  const taskElement = createHtmlElement("div", null, ["task"], null);
-  taskElement.id = task.id;
+  const taskElement = createHtmlElement("div", task.id, ["task"], null);
 
   let type = "div";
   let attributes = [[], []];
 
   if (setting === "input") {
     type = "input";
-    attributes = [
-      ["value", task.title],
-      ["value", task.description],
-    ];
+    attributes = [[["value", task.title]],[["value", task.description]]];
   }
 
-
-addCheckBox(task, taskElement);
+  addCheckBox(task, taskElement);
 
   const title = createHtmlElement(
     type,
     null,
     ["task-title"],
     task.title,
-    attributes[0]
+    attributes[0],
   );
 
   const description = createHtmlElement(
@@ -204,12 +227,12 @@ addCheckBox(task, taskElement);
     null,
     ["description"],
     task.description,
-    attributes[1]
+    attributes[1],
   );
 
   const priority = createHtmlElement("div", null, ["priority"], task.priority);
 
-  const dueDate = createHtmlElement("div", null, ["due-date"], task.dueDate);
+  const dueDate = createDateInput(task.dueDate);
 
   const assignedProject = createHtmlElement(
     "div",
@@ -218,34 +241,61 @@ addCheckBox(task, taskElement);
     task.project.title
   );
 
+
+
+  const dueStatus = createHtmlElement(
+    "div",
+    null,
+    ["due-status"],
+    dueDateChecker(task.dueDate)
+  );
+
+  const leftWrapper = createHtmlElement('div', null, ['task-left-wrapper']);
+  leftWrapper.append(title, dueStatus);
+
   if (setting === "input") {
-    taskElement.append(title, description, priority, dueDate, assignedProject);
-    /* addEditButton(taskElement);
-    addRemoveButton(taskElement); */
+    const wrapper = createHtmlElement('div', null, ['date-priority-wrapper']);
+    const leftWrapper = createHtmlElement('div', null, ['task-left-wrapper']);
+    const textWrapper = createHtmlElement('div', null, ['input-text-wrapper']);
+    textWrapper.append(title, description);
+
+    wrapper.append(dueDate, priority)
+    leftWrapper.append(textWrapper);
+    taskElement.append(leftWrapper, wrapper, assignedProject);
+    closedTaskActions(taskElement);
 
     return taskElement;
   }
 
   if (setting === "expanded") {
-    taskElement.append(title, description, priority, dueDate, assignedProject);
-    addEditButton(taskElement);
-    addRemoveButton(taskElement);
+
+    const wrapper = createHtmlElement('div', null, ['date-priority-wrapper']);
+    const leftWrapper = createHtmlElement('div', null, ['task-left-wrapper']);
+    const textWrapper = createHtmlElement('div', null, ['input-text-wrapper']);
+    textWrapper.append(title, description);
+
+    wrapper.append(dueDate, priority)
+    leftWrapper.append(textWrapper);
+    taskElement.append(leftWrapper, wrapper, assignedProject);
+    closedTaskActions(taskElement);
 
     return taskElement;
   }
 
-  taskElement.append(title);
+  taskElement.append(leftWrapper, assignedProject);
 
   closedTaskActions(taskElement);
 
- function closedTaskActions(element) {
-  const actionsWrapper = createHtmlElement('div', null, ['task-actions-wrapper']);
+  function closedTaskActions(element) {
+    const actionsWrapper = createHtmlElement("div", null, [
+      "task-actions-wrapper",
+    ]);
 
-  addEditButton(actionsWrapper);
-  addRemoveButton(actionsWrapper);
+    addEditButton(actionsWrapper);
+    addRemoveButton(actionsWrapper);
 
-  element.append(actionsWrapper);
- }
+    element.append(actionsWrapper);
+  }
 
   return taskElement;
 }

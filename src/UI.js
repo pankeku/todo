@@ -37,7 +37,7 @@ function createHtmlElement(type, id, arrayClasses, content, attributes) {
 
   if (attributes) {
     attributes.forEach((attribute) =>
-      element.setAttribute(attributes[0], attributes[1])
+      element.setAttribute(attribute[0], attribute[1])
     );
   }
 

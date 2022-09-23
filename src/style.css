@@ -1,7 +1,7 @@
 body {
   font-family: 'Roboto', sans-serif;
   font-weight: 300;
-  font-size: 15px;
+  font-size: 18px;
   margin: 0px;
 }
 .main-container {
@@ -63,9 +63,6 @@ input:focus {
   justify-content: center;
 }
 
-.task-close {
-}
-
 .container {
   display: flex;
 }
@@ -83,7 +80,7 @@ input:focus {
 .nav {
   min-width: 100px;
   height: 100vh;
-  background-color: coral;
+  background-color:sandybrown ;
 }
 
 .header {
@@ -116,34 +113,135 @@ input:focus {
 }
 
 .task {
-  display: flex;
+  display: grid;
+  grid-template-columns: 30px 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
   padding: 10px;
 }
 
-.task:hover {
-  background-color: aquamarine;
+.task--expanded {
+  grid-template-rows: 1fr 0.5fr 0.5fr;
+  grid-template-columns: 30px 1fr 1fr 150px;
 }
 
-.task-title {
-  width: 100%;
+.task:hover {
+  outline: 5px solid aquamarine;
+}
+
+.save {
+  grid-column: 3;
+  grid-row: 3;
+}
+
+.newtask-date {
+  border: 0px;
+  width: fit-content;
+}
+
+.priority {
+  font-size: 0.9rem;
+}
+
+.date-priority-wrapper {
+  grid-column: 2;
+  grid-row: 3;
+  display: flex;
+  padding-left: 10px;
+  padding-top: 10px;
 }
 
 .task-actions-wrapper {
+  display: flex;
+  gap: 5px;
+  width: 100px;
+  justify-self: end;
+  grid-column: 4;
+}
+
+.edit, .remove {
+  display: none;
+  font-size: 0.9rem;
+}
+
+.task-left-wrapper {
+  grid-row: span 2;
+  grid-column: span 2;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  background-color: white;
+  gap: 5px;
+}
+
+.task--expanded .task-left-wrapper {
+   outline: 1px solid black;
+}
+
+.task-title {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.assigned-project {
+  font-size: 1rem;
+  background-color: yellow;
+  width: fit-content;
+  height: fit-content;
+  padding: 3px;
+  grid-row: 2;
+  grid-column: 4;
+  justify-self: end;
+}
+
+input[type="checkbox"] {
+
+}
+
+.due-status {
+  display: flex;
+  font-size: 0.8rem;
+}
+
+.complete {
+  display: flex;
+  width: 20px;
+  grid-row: span 2;
+
+}
+
+.task:hover .task-actions-wrapper > div {
+  display: block;
+}
+
+div[id="-2"] .task .task-actions-wrapper {
   display: none;
 }
 
-.task:hover .task-actions-wrapper {
+.newtask-date-picker {
+  display: none;
+  position: absolute;
+  top: 10px;
+  right: 50;
+
+}
+
+.task--expanded :is(.edit, .remove) {
+  display: block;
+}
+
+.input-text-wrapper {
+  background-color: white;
   display: flex;
-  gap: 5px;
-
+  flex-direction: column;
+  border-radius: 5px;
 }
 
-.task--expanded {
-  display: grid;
-  grid-template-columns: 1fr 1fr 100px 100px;
-  grid-template-rows: 1fr 1fr;
-
+.input-text-wrapper :is(.task-title, .description) {
+  border:none;
+    background-image:none;
 }
+
+
 
 .task--expand {
   display: flex;
@@ -158,14 +256,7 @@ input:focus {
   display: none;
 }
 
-.task-title {
-  grid-column-start: span 4;
-  padding: 5px;
-  font-weight: 700;
-}
-
 .description {
-  grid-column-start: span 2;
-  padding: 5px;
   font-style: italic;
+  font-size: 0.8rem;
 }

@@ -9,7 +9,7 @@ import {
   toggleTaskCompletion,
   getDoneList,
 } from "./Manager";
-import { display, update } from "./UI";
+import { display, update, createHtmlElement } from "./UI";
 import { handler, taskGenerator, task, expandTask } from "./ui-modules/content";
 import { updateNav } from "./ui-modules/nav";
 
@@ -61,6 +61,9 @@ export default function loadListeners() {
     }
 
     if (event.target.classList.contains("task")) {
+
+      if (event.target.closest('.project').id === '-2') return;
+
       let task = getTaskById(event.target.id);
 
       expandTask(task, event.target, true);
@@ -73,11 +76,12 @@ export default function loadListeners() {
     }
 
     if (event.target.className === "edit") {
-      toggleInput(event, taskGenerator, "input");
+      toggleInput(event, "input");
+
     }
 
     if (event.target.className === "save") {
-      toggleInput(event, taskGenerator, "expanded");
+      toggleInput(event, "expanded");
     }
   });
 
@@ -99,18 +103,53 @@ export default function loadListeners() {
     }
   });
 
+content.addEventListener('change', (event)=> {
+
+  if (event.target.className === 'newtask-date-picker') {
+
+    const date = event.target.closest('.newtask-date');
+    date.value = event.target.value;
+
+
+    let taskElement = event.target.closest('.task');
+
+    if (taskElement) {
+      let task = getTaskById(taskElement.id);
+      task.dueDate = date.value;
+
+      console.log(task.dueDate)
+    }
+
+
+
+  }
+
+})
+
   content.addEventListener("click", (event) => {
+
+
+    if (event.target.className === 'newtask-date') {
+      let todaysDate = new Date().toISOString().slice(0,10);
+      const newDate = createHtmlElement("input", null, ["newtask-date-picker"], "Date", [['type', 'date'], ['min', todaysDate], ['value', todaysDate]]);
+      if (!event.target.contains(newDate)) event.target.appendChild(newDate);
+      event.target.value = newDate.value;
+     newDate.showPicker();
+    }
+
     if (event.target.className === "task-close") {
       const description = content.querySelector(".new-description");
       let newTaskBar = document.querySelector(".text-bar");
       const project = event.target.closest(".project");
+      const dueDate = document.querySelector('.newtask-date');
 
+      console.log(dueDate.value);
       if (newTaskBar.value !== "" || description.value !== "") {
         addNewTask(
           project.id,
           newTaskBar.value,
           description.value,
-          "Date",
+          dueDate.value,
           "Priority"
         );
         return;
@@ -128,22 +167,22 @@ export default function loadListeners() {
   });
 }
 
-function toggleInput(event, taskGenerator, setting) {
-  let parent = getParent(event);
-  let element = taskGenerator(getTask(event), setting);
-  parent.replaceChildren(...element.childNodes);
+function toggleInput(event, setting) {
+  let taskElement = event.target.closest('.task');
+
+  let task = getTaskById(taskElement.id);
+  let element = taskGenerator(task, setting);
+  taskElement.replaceChildren(...element.childNodes);
+  taskElement.classList.add('task--expanded');
 
   if (setting === "input") {
     let save = document.createElement("div");
     save.classList.add("save");
     save.textContent = "Save";
-    parent.appendChild(save);
+    taskElement.appendChild(save);
   }
 }
 
-function getParent(event) {
-  return event.target.parentElement;
-}
 
 function getParentId(event) {
   const parent = event.target.parentElement;
