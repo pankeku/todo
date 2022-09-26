@@ -1,4 +1,4 @@
-import config from '../config';
+import {config} from '../config';
 import {createHtmlElement } from '../UI';
 
 function render() {

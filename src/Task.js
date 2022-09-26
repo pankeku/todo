@@ -1,4 +1,4 @@
-let number = 0;
+let number = 1;
 
 export default function createTask(title1, description, dueDate, priority) {
   let project;

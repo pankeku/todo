@@ -1,5 +1,17 @@
+:root {
+  --p1-color: rgba(0, 128, 0, 0.3);
+  --p2-color: rgba(255, 255, 0, 0.3);
+  --p3-color: rgba(255, 165, 0, 0.3);
+  --p4-color: rgba(255, 69, 0, 0.3);
+  --p1-border-color: rgba(0, 128, 0, 0.8);
+  --p2-border-color: rgba(255, 255, 0, 0.8);
+  --p3-border-color: rgba(255, 165, 0, 0.8);
+  --p4-border-color: rgba(255, 69, 0, 0.8);
+  --check-icon: url('data:image/svg+xml,<svg viewBox="0 0 16 16" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z"/></svg>');
+}
+
 body {
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   font-weight: 300;
   font-size: 18px;
   margin: 0px;
@@ -12,8 +24,8 @@ body {
 .task-container {
   display: flex;
   flex-direction: column;
-    box-sizing: border-box;
-    box-shadow: 0 2px 6px 2px rgba(60,64,67,0.149);
+  box-sizing: border-box;
+  box-shadow: 0 2px 6px 2px rgba(60, 64, 67, 0.149);
   border-radius: 5px;
   padding: 10px;
   width: 100%;
@@ -24,37 +36,46 @@ body {
 
 .task-inside-container {
   flex: 1;
-    display: flex;
+  display: flex;
 }
 
 .newtask-left-wrapper {
   display: flex;
   width: 80%;
   flex-direction: column;
+  gap: 5px;
 }
 
 .newtask-right-wrapper {
+  padding: 5px;
   flex: 1;
-  display:flex;
+  display: flex;
   flex-direction: column;
+  gap: 5px;
+}
+
+.newtask-priority {
+  width: 40px;
 }
 
 .text-bar {
-    padding: 5px;
-    width: 100%;
-    border: 0px;
+  font-weight: 700;
+  padding: 5px;
+  width: 100%;
+  border: 0px;
 }
 
 .new-description {
-    border: 0px;
+  border: 0px;
+  padding: 5px;
 }
 
 input:focus {
-    outline: 0px;
+  outline: 0px;
 }
 
 .task-container--expand {
-  height: 100px;
+  height: 120px;
 }
 
 .newtask-footer {
@@ -78,10 +99,55 @@ input:focus {
 }
 
 .nav {
-  min-width: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 150px;
   height: 100vh;
-  background-color:sandybrown ;
+  background-color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding-top: 20px;
 }
+
+.nav-home {
+  padding: 10px;
+  margin-bottom: 20px;
+  width: 100px;
+}
+
+.nav-items {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0px;
+
+}
+
+.nav-item {
+  all: unset;
+  width: 100px;
+   padding: 10px;
+
+}
+
+.nav-item:hover {
+  color: green;
+}
+
+.project-add {
+  padding: 10px;
+  margin-top: 20px;
+  width: 100px;
+}
+
+.done-tasks {
+  padding: 10px;
+  margin-top: 20px;
+  width: 100px;
+}
+
+
 
 .header {
   height: 40px;
@@ -110,6 +176,7 @@ input:focus {
 
 .project-title {
   font-size: 1.3rem;
+  font-weight: 700;
 }
 
 .task {
@@ -125,12 +192,54 @@ input:focus {
 }
 
 .task:hover {
-  outline: 5px solid aquamarine;
+
+}
+
+.task-close {
+  font-size: 0.8rem;
 }
 
 .save {
+  align-self: center;
+  justify-self: right;
+  font-size: 0.8rem;
   grid-column: 3;
   grid-row: 3;
+}
+
+input[type="checkbox"] {
+  appearance: none;
+  grid-row: span 2;
+  align-self: center;
+  /* background-color:rgba(255,0, 0, 0.4); */
+  margin: 0;
+  font: inherit;
+  color: white;
+  width: 1.15em;
+  height: 1.15em;
+  border-radius: 50px;
+  display: grid;
+  transition: outline 50ms 50ms ease-in-out;
+}
+
+input[type="checkbox"]:hover {
+  outline-color: white;
+  outline: 0.15em solid;
+  background-image: var(--check-icon);
+}
+
+input[type="checkbox"]:checked {
+  background-image: var(--check-icon);
+}
+
+select {
+  outline: 0px;
+  border: 0px;
+  background-color: white;
+}
+
+select:hover {
+  border: 1px solid black;
 }
 
 .newtask-date {
@@ -146,8 +255,8 @@ input:focus {
   grid-column: 2;
   grid-row: 3;
   display: flex;
-  padding-left: 10px;
-  padding-top: 10px;
+  padding-left: 15px;
+  padding-top: 5px;
 }
 
 .task-actions-wrapper {
@@ -158,7 +267,8 @@ input:focus {
   grid-column: 4;
 }
 
-.edit, .remove {
+.edit,
+.remove {
   display: none;
   font-size: 0.9rem;
 }
@@ -173,13 +283,62 @@ input:focus {
   gap: 5px;
 }
 
-.task--expanded .task-left-wrapper {
-   outline: 1px solid black;
+.input-text-wrapper {
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  border-radius: 5px;
+  gap: 5px;
+}
+
+.input-text-wrapper :is(.task-title, .description) {
+  border: none;
+  background-image: none;
+}
+
+textarea {
+  font-family: "Roboto";
+  width: 300px;
+  resize: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: hidden;
+}
+
+.task-edit {
+  border: none;
+  border-radius: 2pt;
+  box-shadow: 0 0 0 1pt grey;
+  outline: none;
+  transition: 1s;
 }
 
 .task-title {
   font-weight: 700;
   font-size: 1rem;
+  padding: 5px;
+  outline: 0px;
+}
+
+.task--expanded :is(.edit, .remove) {
+  display: block;
+}
+
+.task--expand {
+  display: flex;
+  height: 100px;
+  flex-direction: column;
+}
+
+.task-title--hidden {
+  display: none;
+}
+
+.description {
+  font-style: italic;
+  font-size: 0.8rem;
+  padding: 5px;
+  outline: 0px;
 }
 
 .assigned-project {
@@ -193,21 +352,12 @@ input:focus {
   justify-self: end;
 }
 
-input[type="checkbox"] {
-
-}
-
 .due-status {
   display: flex;
   font-size: 0.8rem;
+  margin-left: 5px;
 }
 
-.complete {
-  display: flex;
-  width: 20px;
-  grid-row: span 2;
-
-}
 
 .task:hover .task-actions-wrapper > div {
   display: block;
@@ -222,41 +372,4 @@ div[id="-2"] .task .task-actions-wrapper {
   position: absolute;
   top: 10px;
   right: 50;
-
-}
-
-.task--expanded :is(.edit, .remove) {
-  display: block;
-}
-
-.input-text-wrapper {
-  background-color: white;
-  display: flex;
-  flex-direction: column;
-  border-radius: 5px;
-}
-
-.input-text-wrapper :is(.task-title, .description) {
-  border:none;
-    background-image:none;
-}
-
-
-
-.task--expand {
-  display: flex;
-  height: 100px;
-  flex-direction: column;
-}
-
-.task-title-input {
-}
-
-.task-title--hidden {
-  display: none;
-}
-
-.description {
-  font-style: italic;
-  font-size: 0.8rem;
 }
