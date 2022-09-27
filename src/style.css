@@ -8,6 +8,7 @@
   --p3-border-color: rgba(255, 165, 0, 0.8);
   --p4-border-color: rgba(255, 69, 0, 0.8);
   --check-icon: url('data:image/svg+xml,<svg viewBox="0 0 16 16" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z"/></svg>');
+  --edit-icon: url(../static/icons/edit.svg);
 }
 
 body {
@@ -48,14 +49,39 @@ body {
 
 .newtask-right-wrapper {
   padding: 5px;
-  flex: 1;
   display: flex;
-  flex-direction: column;
-  gap: 5px;
+  flex-direction: row;
+  gap: 20px;
+}
+
+.task .newtask-right-wrapper {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+.newtask-footer {
+  display: flex;
+  align-items: center;
 }
 
 .newtask-priority {
   width: 40px;
+}
+
+.close-wrapper {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  margin: 2px;
+}
+
+.task-close {
+  font-size: 0.8rem;
+  margin-right: 23%;
+}
+
+.date-label {
+  content: url(../static/icons/calendar.svg);
 }
 
 .text-bar {
@@ -76,12 +102,6 @@ input:focus {
 
 .task-container--expand {
   height: 120px;
-}
-
-.newtask-footer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .container {
@@ -121,14 +141,12 @@ input:focus {
   flex-direction: column;
   align-items: center;
   margin: 0px;
-
 }
 
 .nav-item {
   all: unset;
   width: 100px;
-   padding: 10px;
-
+  padding: 10px;
 }
 
 .nav-item:hover {
@@ -146,8 +164,6 @@ input:focus {
   margin-top: 20px;
   width: 100px;
 }
-
-
 
 .header {
   height: 40px;
@@ -174,9 +190,29 @@ input:focus {
   gap: 10px;
 }
 
+.project-title-wrapper {
+  display: flex;
+  gap: 5px;
+}
 .project-title {
   font-size: 1.3rem;
   font-weight: 700;
+  height: 30px;
+}
+
+.project-title-edit {
+  display: none;
+  content: var(--edit-icon);
+  width: 15px;
+  height: 15px;
+}
+
+.project-title-wrapper:hover .project-title-edit {
+display: block;
+}
+
+.editing {
+  padding: 10px;
 }
 
 .task {
@@ -192,11 +228,6 @@ input:focus {
 }
 
 .task:hover {
-
-}
-
-.task-close {
-  font-size: 0.8rem;
 }
 
 .save {
@@ -222,9 +253,12 @@ input[type="checkbox"] {
   transition: outline 50ms 50ms ease-in-out;
 }
 
-input[type="checkbox"]:hover {
-  outline-color: white;
+.task:hover input[type="checkbox"] {
   outline: 0.15em solid;
+}
+
+input[type="checkbox"]:hover {
+
   background-image: var(--check-icon);
 }
 
@@ -240,15 +274,34 @@ select {
 
 select:hover {
   border: 1px solid black;
+  font-weight: 700;
+}
+
+.newtask-date-wrapper {
+  display: flex;
+  gap: 5px;
 }
 
 .newtask-date {
   border: 0px;
-  width: fit-content;
+  width: 70px;
+  text-align: center;
+}
+
+.newtask-date:hover {
+  font-weight: 700;
+}
+
+.priority-wrapper {
+  display: flex;
 }
 
 .priority {
   font-size: 0.9rem;
+}
+
+.priority-label {
+  content: url(../static/icons/priority.svg)
 }
 
 .date-priority-wrapper {
@@ -262,7 +315,7 @@ select:hover {
 .task-actions-wrapper {
   display: flex;
   gap: 5px;
-  width: 100px;
+
   justify-self: end;
   grid-column: 4;
 }
@@ -271,6 +324,18 @@ select:hover {
 .remove {
   display: none;
   font-size: 0.9rem;
+}
+
+.edit {
+  content: var(--edit-icon);
+  width: 25px;
+  height: 25px;
+}
+
+.remove {
+  content: url(../static/icons/delete.svg);
+  width: 25px;
+  height: 25px;
 }
 
 .task-left-wrapper {
@@ -357,7 +422,6 @@ textarea {
   font-size: 0.8rem;
   margin-left: 5px;
 }
-
 
 .task:hover .task-actions-wrapper > div {
   display: block;

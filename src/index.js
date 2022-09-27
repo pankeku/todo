@@ -20,8 +20,10 @@ addTask(project2, task2);
 
 addTask(project3, task3);
 
+console.log(projects)
 
-//removeTask(task3);
+localStorage.setItem = ('projects', JSON.parse(JSON.stringify(projects)));
+console.log(localStorage);
 
 
 //main();

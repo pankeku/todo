@@ -62,11 +62,7 @@ export default function loadListeners() {
 
   content.addEventListener("click", (event) => {
 
-    if (event.target.className == 'newtask-priority') {
-
-    }
-
-    if (event.target.className === "task-priority-reselector") {
+    if (event.target.className === "newtask-priority" && event.target.closest('.task') !== null) {
       const taskElement = event.target.closest(".task");
       const task = getTaskById(taskElement.id);
 
@@ -109,6 +105,14 @@ export default function loadListeners() {
   });
 
   content.addEventListener("keyup", (event) => {
+
+    if (event.target.classList.contains('project-title')) {
+      const project = getProjectById(event.target.closest('.project').id);
+      project.title = event.target.textContent;
+
+      console.log(project.title)
+    }
+
     if (event.target.className === "task-title") {
       let task = getTask(event);
       console.log(task);
@@ -144,13 +148,33 @@ export default function loadListeners() {
   });
 
   content.addEventListener("mouseover", (e) => {
-    if (e.target.className === "complete") {
-      const task = getTaskById(e.target.closest(".task").id);
-      setCheckBoxOutlineColor(e.target, task, "hover");
+    if (e.target.className === "task") {
+      const task = getTaskById(e.target.id);
+      const checkbox = event.target.querySelector('.complete');
+      setCheckBoxOutlineColor(checkbox, task);
     }
   });
 
+  content.addEventListener('focusout', (event)=> {
+    if (event.target.className === 'project-title editing') {
+      const project = getProjectById(event.target.closest('.project').id);
+      display(project);
+      updateNav();
+
+    }
+  })
+
   content.addEventListener("click", (event) => {
+
+    if(event.target.className === 'project-title-edit') {
+      const projectTitle = document.querySelector('.project-title');
+      const project = getProjectById(event.target.closest('.project').id);
+
+      projectTitle.setAttribute('contenteditable', 'true');
+      projectTitle.focus();
+      projectTitle.classList.add('editing');
+    }
+
     if (event.target.className === "newtask-date") {
       let todaysDate = new Date().toISOString().slice(0, 10);
       const newDate = createHtmlElement(

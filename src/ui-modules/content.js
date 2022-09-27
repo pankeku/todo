@@ -36,11 +36,13 @@ function task() {
 }
 
 function createDateInput(date) {
-  if (!date) date = "Set date";
+  if (!date) date = "Due date";
 
-  const newDate = createHtmlElement("input", null, ["newtask-date"], "Date", [
+  const newDate = createHtmlElement("input", "date", ["newtask-date"], "Date", [
     ["type", "text"],
     ["value", date],
+    ["name", "date"],
+    ["title", "Set due date"],
   ]);
   return newDate;
 }
@@ -64,7 +66,10 @@ function prioritySelector(taskPriority) {
     "priority-select",
     ["task-priority-reselector"],
     null,
-    [["name", "priority"]]
+    [
+      ["name", "priority"],
+      ["title", "Set priority"],
+    ]
   );
   const priorities = ["P1", "P2", "P3", "P4"];
 
@@ -112,35 +117,67 @@ function handler() {
     null
   );
   const titleBar = document.querySelector(".text-bar");
-  titleBar.setAttribute('placeholder', 'Title');
-  titleBar.setAttribute('autofocus', '');
+  titleBar.setAttribute("placeholder", "Title");
+  titleBar.setAttribute("autofocus", "");
   leftWrapper.append(titleBar, description);
 
-  const rightWrapper = createHtmlElement("div", null, [
-    "newtask-right-wrapper",
-  ]);
-
-  const newPriority = prioritySelector('P1');
-  newPriority.className = 'newtask-priority';
-
-  const dateWrapper = createHtmlElement("div", null, ["newtask-date-wrapper"]);
-
-  dateWrapper.append(createDateInput());
-  rightWrapper.append(dateWrapper, newPriority);
+  const dateAndPriorityContainer = generateDateAndPriority();
 
   taskContainer.classList.add("task-container--expand");
 
   if (container.lastChild === document.querySelector(".text-bar")) {
     container.append(leftWrapper);
-    container.append(rightWrapper);
     taskContainer.appendChild(taskFooter);
+    taskFooter.appendChild(dateAndPriorityContainer);
     taskFooter.appendChild(taskContent());
   }
 }
 
+function generateDateAndPriority(task) {
+  let priority = "P1";
+  let dateSetting = false;
+
+  if (task) {
+    priority = task.priority;
+    dateSetting = task.dueDate;
+  }
+
+  const container = createHtmlElement("div", null, ["newtask-right-wrapper"]);
+
+  const priorityWrapper = createHtmlElement("div", null, ["priority-wrapper"]);
+
+  const newPriority = prioritySelector(priority);
+  newPriority.className = "newtask-priority";
+
+  const priorityLabel = createHtmlElement(
+    "div",
+    null,
+    ["priority-label"],
+    null,
+    [["for", newPriority.id]]
+  );
+
+  priorityWrapper.append(priorityLabel, newPriority);
+
+  const dateWrapper = createHtmlElement("div", null, ["newtask-date-wrapper"]);
+
+  const date = createDateInput(dateSetting);
+
+  const dateLabel = createHtmlElement("div", null, ["date-label"], "Due date", [
+    ["for", date.id],
+  ]);
+  dateWrapper.append(dateLabel, date);
+
+  container.append(dateWrapper, priorityWrapper);
+
+  return container;
+}
+
 function taskContent() {
+  const wrapper = createHtmlElement("div", null, ["close-wrapper"]);
   const close = createHtmlElement("div", null, ["task-close"], "Close");
-  return close;
+  wrapper.appendChild(close);
+  return wrapper;
 }
 
 function clear() {
@@ -168,6 +205,8 @@ function projectGenerator(project) {
     ["project"],
     null
   );
+
+  const titleWrapper = createHtmlElement('div', null, ['project-title-wrapper']);
   const projectTitle = createHtmlElement(
     "div",
     null,
@@ -175,9 +214,31 @@ function projectGenerator(project) {
     project.title
   );
 
-  projectElement.appendChild(projectTitle);
+  titleWrapper.append(projectTitle);
+
+  projectElement.appendChild(titleWrapper);
+
+  projectTitleEditable(titleWrapper);
 
   return projectElement;
+}
+
+function projectTitleEditable(titleElement) {
+  if (
+    titleElement.closest(".project").id == -1 ||
+    titleElement.closest(".project").id == -2
+  ) {
+    return;
+  }
+
+  const titleEdit = createHtmlElement(
+    "div",
+    null,
+    ["project-title-edit"],
+    null
+  );
+
+  titleElement.appendChild(titleEdit);
 }
 
 function createTasks(project) {
@@ -270,9 +331,12 @@ function taskGenerator(task, setting) {
     attributes[1]
   );
 
-  const priority = prioritySelector(task.priority);
-
-  const dueDate = createDateInput(task.dueDate);
+  const dueStatus = createHtmlElement(
+    "div",
+    null,
+    ["due-status"],
+    dueDateChecker(task.dueDate)
+  );
 
   const assignedProject = createHtmlElement(
     "div",
@@ -281,18 +345,13 @@ function taskGenerator(task, setting) {
     task.project.title
   );
 
-  const dueStatus = createHtmlElement(
-    "div",
-    null,
-    ["due-status"],
-    dueDateChecker(task.dueDate)
-  );
+
+  const dateAndPriorityWrapper = generateDateAndPriority(task);
 
   const leftWrapper = createHtmlElement("div", null, ["task-left-wrapper"]);
   leftWrapper.append(title, dueStatus);
 
   if (setting === "input") {
-    const wrapper = createHtmlElement("div", null, ["date-priority-wrapper"]);
     const leftWrapper = createHtmlElement("div", null, [
       "task-left-wrapper",
       "task-edit",
@@ -300,23 +359,20 @@ function taskGenerator(task, setting) {
     const textWrapper = createHtmlElement("div", null, ["input-text-wrapper"]);
     textWrapper.append(title, description);
 
-    wrapper.append(dueDate, priority);
     leftWrapper.append(textWrapper);
-    taskElement.append(leftWrapper, wrapper, assignedProject);
+    taskElement.append(leftWrapper, dateAndPriorityWrapper, assignedProject);
     closedTaskActions(taskElement);
 
     return taskElement;
   }
 
   if (setting === "expanded") {
-    const wrapper = createHtmlElement("div", null, ["date-priority-wrapper"]);
     const leftWrapper = createHtmlElement("div", null, ["task-left-wrapper"]);
     const textWrapper = createHtmlElement("div", null, ["input-text-wrapper"]);
     textWrapper.append(title, description);
 
-    wrapper.append(dueDate, priority);
     leftWrapper.append(textWrapper);
-    taskElement.append(leftWrapper, wrapper, assignedProject);
+    taskElement.append(leftWrapper, dateAndPriorityWrapper, assignedProject);
     closedTaskActions(taskElement);
 
     return taskElement;
@@ -348,5 +404,5 @@ export {
   task,
   expandTask,
   setCheckBoxColor,
-  setCheckBoxOutlineColor
+  setCheckBoxOutlineColor,
 };

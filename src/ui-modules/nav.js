@@ -10,7 +10,7 @@ function render() {
 
 function generateDoneTasksProj() {
   const doneProject = getDoneList();
-  const done = createHtmlElement('div', doneProject.id, ['done-tasks'], doneProject.title, null);
+  const done = createHtmlElement('div', doneProject.id, ['done-tasks'], 'Completed tasks', null);
 
   return done;
 }
