@@ -2,7 +2,7 @@ import { render as renderNav } from "./ui-modules/nav";
 import { displayProject, render as renderContent } from "./ui-modules/content";
 import { render as renderHeader } from "./ui-modules/header";
 import loadListeners from "./listeners";
-import { projects } from "./Manager";
+import { projects, updateLocalStorage } from "./Manager";
 
 let activeProject = [];
 
@@ -14,6 +14,7 @@ let content = renderContent();
 function display(project) {
   activeProject = project;
   displayProject(project);
+  updateLocalStorage();
 }
 
 function main() {

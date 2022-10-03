@@ -22,9 +22,7 @@ import {
 import { updateNav } from "./ui-modules/nav";
 
 export default function loadListeners() {
-  let tasksEl = document.querySelector(".tasks");
   let nav = document.querySelector(".nav");
-  let project = document.querySelector(".project");
   let content = document.querySelector(".content");
 
   nav.addEventListener("click", (event) => {
@@ -50,19 +48,22 @@ export default function loadListeners() {
 
       task = getTaskById(Number(event.target.closest(".task").id));
 
-      if (!event.target.checked)
+      /* if (!event.target.checked)
         task = getTaskById(
           Number(event.target.closest(".task").id),
           getDoneList()
-        );
+        ); */
 
+          console.log('CALLING TOGGLE TASK COMPLETION METHOD');
       toggleTaskCompletion(task);
     }
   });
 
   content.addEventListener("click", (event) => {
-
-    if (event.target.className === "newtask-priority" && event.target.closest('.task') !== null) {
+    if (
+      event.target.className === "newtask-priority" &&
+      event.target.closest(".task") !== null
+    ) {
       const taskElement = event.target.closest(".task");
       const task = getTaskById(taskElement.id);
 
@@ -96,6 +97,7 @@ export default function loadListeners() {
     }
 
     if (event.target.className === "edit") {
+
       toggleInput(event, "input");
     }
 
@@ -105,12 +107,11 @@ export default function loadListeners() {
   });
 
   content.addEventListener("keyup", (event) => {
-
-    if (event.target.classList.contains('project-title')) {
-      const project = getProjectById(event.target.closest('.project').id);
+    if (event.target.classList.contains("project-title")) {
+      const project = getProjectById(event.target.closest(".project").id);
       project.title = event.target.textContent;
 
-      console.log(project.title)
+      console.log(project.title);
     }
 
     if (event.target.className === "task-title") {
@@ -150,29 +151,27 @@ export default function loadListeners() {
   content.addEventListener("mouseover", (e) => {
     if (e.target.className === "task") {
       const task = getTaskById(e.target.id);
-      const checkbox = event.target.querySelector('.complete');
+      const checkbox = e.target.querySelector(".complete");
       setCheckBoxOutlineColor(checkbox, task);
     }
   });
 
-  content.addEventListener('focusout', (event)=> {
-    if (event.target.className === 'project-title editing') {
-      const project = getProjectById(event.target.closest('.project').id);
+  content.addEventListener("focusout", (event) => {
+    if (event.target.className === "project-title editing") {
+      const project = getProjectById(event.target.closest(".project").id);
       display(project);
       updateNav();
-
     }
-  })
+  });
 
   content.addEventListener("click", (event) => {
+    if (event.target.className === "project-title-edit") {
+      const projectTitle = document.querySelector(".project-title");
+      const project = getProjectById(event.target.closest(".project").id);
 
-    if(event.target.className === 'project-title-edit') {
-      const projectTitle = document.querySelector('.project-title');
-      const project = getProjectById(event.target.closest('.project').id);
-
-      projectTitle.setAttribute('contenteditable', 'true');
+      projectTitle.setAttribute("contenteditable", "true");
       projectTitle.focus();
-      projectTitle.classList.add('editing');
+      projectTitle.classList.add("editing");
     }
 
     if (event.target.className === "newtask-date") {
@@ -201,7 +200,7 @@ export default function loadListeners() {
       let newTaskBar = document.querySelector(".text-bar");
       const project = event.target.closest(".project");
       const dueDate = document.querySelector(".newtask-date");
-      const priority = document.querySelector('.newtask-priority');
+      const priority = document.querySelector(".newtask-priority");
 
       if (newTaskBar.value !== "" || description.value !== "") {
         addNewTask(
@@ -228,6 +227,7 @@ export default function loadListeners() {
 
 function toggleInput(event, setting) {
   let taskElement = event.target.closest(".task");
+  console.log(taskElement);
 
   let task = getTaskById(taskElement.id);
   let element = taskGenerator(task, setting);
@@ -243,7 +243,7 @@ function toggleInput(event, setting) {
 }
 
 function getTaskId(event) {
-  const task = event.target.closest('.task');
+  const task = event.target.closest(".task");
   return Number(task.id);
 }
 

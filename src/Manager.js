@@ -11,34 +11,87 @@ function getDoneList() {
 }
 
 function toggleTaskCompletion(task) {
-  console.log(task);
   if (task.completed) {
-
-    done.remove(done.tasks.indexOf(task));
+    done.remove(getTaskIndex(task, done));
     task.completed = false;
-    task.project.add(task);
-    console.log(task.project);
 
+    let project = getProjectById(task.project);
+
+    project.add(task);
 
     updateTasks();
     update();
 
     return;
   }
+
   task.completed = true;
   done.add(task);
   removeTask(task.id);
-  console.log(task)
-  console.log(done.tasks);
   updateTasks();
   update();
 }
 
 function init() {
-  createDoneTasksProject();
-  defaultProject();
+  initDefaultProjects();
+  updateTasks();
   main();
   display(homeProject);
+  console.dir(homeProject);
+  console.dir(done);
+}
+
+function initDefaultProjects() {
+  createDoneTasksProject();
+  defaultProject();
+
+  const defaultProjects = ["projects", "done"];
+
+  defaultProjects.forEach((name) => {
+    if (localStorage.getItem(name)) {
+      const stored = JSON.parse(localStorage.getItem(name));
+
+      if (name === "done") {
+        stored.add = function (task) {
+          stored.tasks.push(task);
+        };
+
+        stored.remove = function (index) {
+          if (index > -1) {
+            return stored.tasks.splice(index, 1);
+          }
+        };
+        done = stored;
+        console.log(done);
+      }
+
+      if (name === "projects") {
+        stored.forEach((project) => {
+          project.add = function (task) {
+            project.tasks.push(task);
+          };
+
+          project.remove = function (index) {
+            if (index > -1) {
+              return project.tasks.splice(index, 1);
+            }
+          };
+        });
+
+        projects = stored;
+      }
+    }
+  });
+}
+
+function updateLocalStorage() {
+  localStorage.setItem("projects", JSON.stringify(projects));
+  localStorage.setItem("done", JSON.stringify(done));
+  console.log("UPDATING " + done);
+}
+
+function projectFromJson(state) {
+  return state;
 }
 
 function createDoneTasksProject() {
@@ -53,20 +106,22 @@ function getHomeProject() {
 function defaultProject() {
   homeProject = newProject("Home");
   homeProject.id = -1;
-  updateTasks();
 }
 
 function updateTasks() {
   homeProject.tasks = homeProject.tasks.filter(
-    (task) => task.project.title === homeProject.title
+    (task) => getProjectById(task.project).title === homeProject.title
   );
   homeProject.tasks = homeProject.tasks.concat(getAllTasks());
 }
 
 function addNewTask(projectId, title, description, dueDate, priority) {
-  let project = getProjectById(Number(projectId));
+  console.log(getProjectById(projectId));
 
-  addTask(project, createTask(title, description, dueDate, priority));
+  addTask(
+    getProjectById(projectId),
+    createTask(title, description, dueDate, priority)
+  );
 
   updateTasks();
   update();
@@ -74,24 +129,37 @@ function addNewTask(projectId, title, description, dueDate, priority) {
 
 function removeTask(id) {
   let task = getTaskById(id);
+  let project = getProjectById(task.project);
+  let index = getTaskIndex(task, project);
+  console.log(task);
+  console.log(index);
+  console.log(project);
 
-  task.project.remove(getTaskIndex(task));
-
+  project.remove(index);
   updateTasks();
   update();
 }
 
 function getTaskById(id, project) {
   id = Number(id);
-
   if (project) {
-    return project.tasks.find((task) => task.id === id);
+    return project.tasks.find((task) => task.id == id);
   }
 
   let found;
   projects.forEach((project) => {
-    found = project.tasks.find((task) => task.id === id);
+    project.tasks.forEach((task) => {
+      if (task.id === id) {
+        found = task;
+      }
+    });
+
+    //found = project.tasks.find(task => task.id === id);
   });
+  if (!found) {
+    found = done.tasks.find((task) => task.id == id);
+  }
+
   return found;
 }
 
@@ -101,21 +169,25 @@ function locateProject(projectIndex) {
   return project;
 }
 
-function getTaskIndex(task) {
-  const project = task.project;
-  const index = project.tasks.indexOf(task);
+function getTaskIndex(task, project) {
+  //const project = getProjectById(task.project);
+
+  const index = project.tasks.findIndex(item => item.id == task.id);
+
   if (index > -1) {
     return index;
+  } else {
+    throw new Error('TASK IS NOT FOUND IN THE PROJECT, TASK INDEX IS -1')
   }
-  return null;
 }
 
 function getProjectById(id) {
   id = Number(id);
 
   if (id === -1) return getHomeProject();
+  if (id === -2) return getDoneList();
 
-  const project = projects.find((project) => project.id === id);
+  const project = projects.find((project) => project.id == id);
   return project;
 }
 
@@ -170,5 +242,6 @@ export {
   getHomeProject,
   getProjectById,
   getDoneList,
-  toggleTaskCompletion
+  toggleTaskCompletion,
+  updateLocalStorage,
 };

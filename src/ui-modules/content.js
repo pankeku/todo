@@ -1,4 +1,4 @@
-import { getProjectIndex } from "../Manager";
+import { getProjectById, getProjectIndex } from "../Manager";
 import { createHtmlElement, makeEditable } from "../UI";
 import isToday from "date-fns/isToday";
 import { parseISO, formatDistanceToNow, isBefore } from "date-fns";
@@ -342,7 +342,7 @@ function taskGenerator(task, setting) {
     "div",
     null,
     ["assigned-project"],
-    task.project.title
+    getProjectById(task.project).title
   );
 
 
