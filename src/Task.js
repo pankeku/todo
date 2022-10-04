@@ -1,6 +1,8 @@
-let number = 1;
+import { getTaskNumber } from "./localStorage";
 
-export default function createTask(title1, description, dueDate, priority) {
+let number = getTaskNumber();
+
+function createTask(title1, description, dueDate, priority) {
   let project;
   let id = number++;
   let title = title1;
@@ -29,3 +31,5 @@ export default function createTask(title1, description, dueDate, priority) {
     completed
   };
 }
+
+export {number, createTask};

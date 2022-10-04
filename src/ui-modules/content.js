@@ -1,5 +1,10 @@
-import { getProjectById, getProjectIndex } from "../Manager";
-import { createHtmlElement, makeEditable } from "../UI";
+import {
+  getProjectById,
+  getProjectIndex,
+  getProjectsTitles,
+  projects,
+} from "../Manager";
+import { activeProject, createHtmlElement, makeEditable } from "../UI";
 import isToday from "date-fns/isToday";
 import { parseISO, formatDistanceToNow, isBefore } from "date-fns";
 import { priorityBorderColors, priorityColors } from "../config";
@@ -99,6 +104,7 @@ function setCheckBoxOutlineColor(element, task) {
 }
 
 function handler() {
+
   let taskContainer = document.querySelector(".task-container");
   let container = document.querySelector(".task-inside-container");
   const description = createHtmlElement(
@@ -119,9 +125,13 @@ function handler() {
   const titleBar = document.querySelector(".text-bar");
   titleBar.setAttribute("placeholder", "Title");
   titleBar.setAttribute("autofocus", "");
+
   leftWrapper.append(titleBar, description);
 
   const dateAndPriorityContainer = generateDateAndPriority();
+
+  const projectSelection = projectSelector();
+  dateAndPriorityContainer.append(projectSelection);
 
   taskContainer.classList.add("task-container--expand");
 
@@ -131,6 +141,53 @@ function handler() {
     taskFooter.appendChild(dateAndPriorityContainer);
     taskFooter.appendChild(taskContent());
   }
+}
+
+function projectSelector() {
+  const projectSelectWrapper = createHtmlElement("div", null, [
+    "project-select-wrapper",
+  ]);
+
+  const projectSelect = createHtmlElement(
+    "select",
+    "project-select",
+    ["project-select"],
+    null,
+    [
+      ["name", "project-selector"],
+      ["title", "Choose project"],
+    ]
+  );
+
+  const projectSelectLabel = createHtmlElement(
+    "div",
+    null,
+    ["project-select-label"],
+    null,
+    [["for", projectSelect.id]]
+  );
+
+  getProjectsTitles().forEach((item) => {
+
+    for (let title in item) {
+
+      const projectId = item[title];
+
+      const option = createHtmlElement("option", projectId, null, title, [
+        ["value", title],
+      ]);
+
+      if (projectId == activeProject.id) {
+        option.setAttribute('selected', '');
+      }
+
+      projectSelect.appendChild(option);
+    }
+  });
+
+  projectSelectWrapper.append(projectSelectLabel, projectSelect);
+
+  return projectSelectWrapper;
 }
 
 function generateDateAndPriority(task) {
@@ -206,7 +263,9 @@ function projectGenerator(project) {
     null
   );
 
-  const titleWrapper = createHtmlElement('div', null, ['project-title-wrapper']);
+  const titleWrapper = createHtmlElement("div", null, [
+    "project-title-wrapper",
+  ]);
   const projectTitle = createHtmlElement(
     "div",
     null,
@@ -344,7 +403,6 @@ function taskGenerator(task, setting) {
     ["assigned-project"],
     getProjectById(task.project).title
   );
-
 
   const dateAndPriorityWrapper = generateDateAndPriority(task);
 

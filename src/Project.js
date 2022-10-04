@@ -1,4 +1,6 @@
-let number = 1;
+import { getProjectNumber } from "./localStorage";
+
+let number = getProjectNumber();
 
 function createProject(name = 'Project title') {
   let title = name;
@@ -51,4 +53,4 @@ function addTask(project, task) {
   project.add(task);
 }
 
-export { createProject, addTask};
+export { createProject, addTask, number};

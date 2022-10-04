@@ -1,5 +1,6 @@
+import { getDoneProjectFromStorage, getProjectsFromStorage } from "./localStorage";
 import { createProject, addTask } from "./Project";
-import createTask from "./Task";
+import {createTask} from "./Task";
 import { display, main, update } from "./UI";
 
 let projects = [];
@@ -37,61 +38,13 @@ function init() {
   updateTasks();
   main();
   display(homeProject);
-  console.dir(homeProject);
-  console.dir(done);
 }
 
 function initDefaultProjects() {
   createDoneTasksProject();
   defaultProject();
-
-  const defaultProjects = ["projects", "done"];
-
-  defaultProjects.forEach((name) => {
-    if (localStorage.getItem(name)) {
-      const stored = JSON.parse(localStorage.getItem(name));
-
-      if (name === "done") {
-        stored.add = function (task) {
-          stored.tasks.push(task);
-        };
-
-        stored.remove = function (index) {
-          if (index > -1) {
-            return stored.tasks.splice(index, 1);
-          }
-        };
-        done = stored;
-        console.log(done);
-      }
-
-      if (name === "projects") {
-        stored.forEach((project) => {
-          project.add = function (task) {
-            project.tasks.push(task);
-          };
-
-          project.remove = function (index) {
-            if (index > -1) {
-              return project.tasks.splice(index, 1);
-            }
-          };
-        });
-
-        projects = stored;
-      }
-    }
-  });
-}
-
-function updateLocalStorage() {
-  localStorage.setItem("projects", JSON.stringify(projects));
-  localStorage.setItem("done", JSON.stringify(done));
-  console.log("UPDATING " + done);
-}
-
-function projectFromJson(state) {
-  return state;
+  projects = getProjectsFromStorage(projects);
+  done = getDoneProjectFromStorage(done);
 }
 
 function createDoneTasksProject() {
@@ -172,12 +125,12 @@ function locateProject(projectIndex) {
 function getTaskIndex(task, project) {
   //const project = getProjectById(task.project);
 
-  const index = project.tasks.findIndex(item => item.id == task.id);
+  const index = project.tasks.findIndex((item) => item.id == task.id);
 
   if (index > -1) {
     return index;
   } else {
-    throw new Error('TASK IS NOT FOUND IN THE PROJECT, TASK INDEX IS -1')
+    throw new Error("TASK IS NOT FOUND IN THE PROJECT, TASK INDEX IS -1");
   }
 }
 
@@ -231,6 +184,7 @@ function iterate(fun) {
 
 export {
   projects,
+  done,
   newProject,
   iterate,
   init,
@@ -243,5 +197,4 @@ export {
   getProjectById,
   getDoneList,
   toggleTaskCompletion,
-  updateLocalStorage,
 };

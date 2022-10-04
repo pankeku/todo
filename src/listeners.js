@@ -201,10 +201,12 @@ export default function loadListeners() {
       const project = event.target.closest(".project");
       const dueDate = document.querySelector(".newtask-date");
       const priority = document.querySelector(".newtask-priority");
+      const projectSelector = document.querySelector('.project-select');
+
 
       if (newTaskBar.value !== "" || description.value !== "") {
         addNewTask(
-          project.id,
+          projectSelector.options[(projectSelector.selectedIndex)].id,
           newTaskBar.value,
           description.value,
           dueDate.value,

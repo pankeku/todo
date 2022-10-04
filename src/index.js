@@ -1,6 +1,6 @@
 import { newProject, projects, init, removeTask } from "./Manager";
 import { addTask } from "./Project";
-import createTask from "./Task";
+import {createTask} from "./Task";
 import { main, update } from "./UI";
 import "./style.css";
 import loadListeners from "./listeners";

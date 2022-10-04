@@ -2,7 +2,8 @@ import { render as renderNav } from "./ui-modules/nav";
 import { displayProject, render as renderContent } from "./ui-modules/content";
 import { render as renderHeader } from "./ui-modules/header";
 import loadListeners from "./listeners";
-import { projects, updateLocalStorage } from "./Manager";
+import { projects } from "./Manager";
+import { updateLocalStorage } from "./localStorage";
 
 let activeProject = [];
 
@@ -49,4 +50,4 @@ function update() {
   display(activeProject);
 }
 
-export { main, update, display, container, createHtmlElement };
+export { main, update, display, container, createHtmlElement, activeProject };

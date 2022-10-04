@@ -64,6 +64,10 @@ body {
   align-items: center;
 }
 
+.newtask-right-wrapper, .close-wrapper {
+  width: 50%;
+}
+
 .newtask-priority {
   width: 40px;
 }
@@ -71,13 +75,13 @@ body {
 .close-wrapper {
   flex: 1;
   display: flex;
-  justify-content: center;
+  justify-content: left;
   margin: 2px;
 }
 
 .task-close {
   font-size: 0.8rem;
-  margin-right: 23%;
+
 }
 
 .date-label {
