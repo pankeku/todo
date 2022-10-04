@@ -62,7 +62,7 @@ function getHomeProject() {
 }
 
 function defaultProject() {
-  homeProject = newProject("Home");
+  homeProject = newProject("All tasks");
   homeProject.id = -1;
 }
 
@@ -178,7 +178,7 @@ function getProjectIndex(project) {
 function getProjectsAndTitles() {
   let titles = [];
   projects
-    .filter((project) => project.title !== homeProject.title)
+    .filter((project) => project.id !== homeProject.id)
     .forEach((project) => {
       const obj = {};
       obj[project.title] = project.id;

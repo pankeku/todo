@@ -17,7 +17,7 @@ function generateDoneTasksProj() {
 
 function generateHomeItem() {
   const homeProject = getHomeProject();
-  const home = createHtmlElement('div', homeProject.id, ['nav-home'], homeProject.title, null);
+  const home = createHtmlElement('div', homeProject.id, ['nav-home'], 'Home', null);
 
   return home;
 
