@@ -7,7 +7,7 @@ import {
 import { activeProject, createHtmlElement, makeEditable } from "../UI";
 import isToday from "date-fns/isToday";
 import { parseISO, formatDistanceToNow, isBefore } from "date-fns";
-import { priorityBorderColors, priorityColors } from "../config";
+import { config, priorityBorderColors, priorityColors } from "../config";
 
 const content = createHtmlElement("div", null, ["content"], null);
 
@@ -16,6 +16,7 @@ function render() {
 }
 
 function task() {
+
   const newTaskContainer = createHtmlElement(
     "div",
     null,
@@ -37,7 +38,7 @@ function task() {
   newTaskContainer.append(container);
   container.appendChild(textBar);
 
-  return newTaskContainer;
+return newTaskContainer;
 }
 
 function createDateInput(date) {
@@ -104,7 +105,6 @@ function setCheckBoxOutlineColor(element, task) {
 }
 
 function handler() {
-
   let taskContainer = document.querySelector(".task-container");
   let container = document.querySelector(".task-inside-container");
   const description = createHtmlElement(
@@ -143,6 +143,15 @@ function handler() {
   }
 }
 
+function selectProjectForTask(selectorElement, task) {
+  const options = selectorElement.querySelector('.project-select').options;
+  for (let option in options) {
+    if (options[option].id == task.project) {
+      options[option].setAttribute('selected', '');
+    }
+  }
+}
+
 function projectSelector() {
   const projectSelectWrapper = createHtmlElement("div", null, [
     "project-select-wrapper",
@@ -168,17 +177,19 @@ function projectSelector() {
   );
 
   getProjectsTitles().forEach((item) => {
-
     for (let title in item) {
-
       const projectId = item[title];
 
       const option = createHtmlElement("option", projectId, null, title, [
         ["value", title],
       ]);
 
-      if (projectId == activeProject.id) {
-        option.setAttribute('selected', '');
+       if (projectId == activeProject.id) {
+        option.setAttribute("selected", "");
+      }
+
+      if (projectId == -1) {
+
       }
 
       projectSelect.appendChild(option);
@@ -246,13 +257,17 @@ function displayProject(project) {
 
   let element = projectGenerator(project);
 
-  element.append(task());
+  if (!isCompletedTasksProject(element)) element.append(task());
 
   element.appendChild(createTasks(project));
 
   content.appendChild(element);
 
   return element;
+}
+
+function isCompletedTasksProject(element) {
+  return element.id == config.done.id;
 }
 
 function projectGenerator(project) {
@@ -285,7 +300,7 @@ function projectGenerator(project) {
 function projectTitleEditable(titleElement) {
   if (
     titleElement.closest(".project").id == -1 ||
-    titleElement.closest(".project").id == -2
+    titleElement.closest(".project").id == config.done.id
   ) {
     return;
   }
@@ -397,7 +412,7 @@ function taskGenerator(task, setting) {
     dueDateChecker(task.dueDate)
   );
 
-  const assignedProject = createHtmlElement(
+  let assignedProject = createHtmlElement(
     "div",
     null,
     ["assigned-project"],
@@ -410,6 +425,11 @@ function taskGenerator(task, setting) {
   leftWrapper.append(title, dueStatus);
 
   if (setting === "input") {
+    const projectSelect = projectSelector();
+    dateAndPriorityWrapper.append(projectSelect);
+
+    selectProjectForTask(projectSelect, task);
+    
     const leftWrapper = createHtmlElement("div", null, [
       "task-left-wrapper",
       "task-edit",
@@ -425,12 +445,17 @@ function taskGenerator(task, setting) {
   }
 
   if (setting === "expanded") {
+    const projectSelect = projectSelector();
+    dateAndPriorityWrapper.append(projectSelect);
+
+    selectProjectForTask(projectSelect, task);
+
     const leftWrapper = createHtmlElement("div", null, ["task-left-wrapper"]);
     const textWrapper = createHtmlElement("div", null, ["input-text-wrapper"]);
     textWrapper.append(title, description);
 
     leftWrapper.append(textWrapper);
-    taskElement.append(leftWrapper, dateAndPriorityWrapper, assignedProject);
+    taskElement.append(leftWrapper, dateAndPriorityWrapper);
     closedTaskActions(taskElement);
 
     return taskElement;
@@ -463,4 +488,5 @@ export {
   expandTask,
   setCheckBoxColor,
   setCheckBoxOutlineColor,
+  projectSelector
 };

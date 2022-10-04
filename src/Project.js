@@ -49,7 +49,6 @@ function createProject(name = 'Project title') {
 
 function addTask(project, task) {
   task.project = project.id;
-  console.log(project)
   project.add(task);
 }
 

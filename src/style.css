@@ -88,6 +88,16 @@ body {
   content: url(../static/icons/calendar.svg);
 }
 
+.project-select-wrapper {
+  display: flex;
+}
+
+.project-select-label {
+  content: url(../static/icons/folder.svg);
+}
+
+
+
 .text-bar {
   font-weight: 700;
   padding: 5px;

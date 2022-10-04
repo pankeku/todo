@@ -1,4 +1,4 @@
-import { priorityBorderColors, priorityColors } from "./config";
+import { config, priorityBorderColors, priorityColors } from "./config";
 import {
   getTaskById,
   newProject,
@@ -9,6 +9,7 @@ import {
   getHomeProject,
   toggleTaskCompletion,
   getDoneList,
+  moveTask,
 } from "./Manager";
 import { display, update, createHtmlElement } from "./UI";
 import {
@@ -18,6 +19,7 @@ import {
   expandTask,
   setCheckBoxColor,
   setCheckBoxOutlineColor,
+  projectSelector,
 } from "./ui-modules/content";
 import { updateNav } from "./ui-modules/nav";
 
@@ -54,7 +56,7 @@ export default function loadListeners() {
           getDoneList()
         ); */
 
-          console.log('CALLING TOGGLE TASK COMPLETION METHOD');
+      console.log("CALLING TOGGLE TASK COMPLETION METHOD");
       toggleTaskCompletion(task);
     }
   });
@@ -75,6 +77,13 @@ export default function loadListeners() {
       setCheckBoxOutlineColor(checkbox, task);
     }
 
+    if (event.target.className === 'project-select' && event.target.closest('.task') !== null) {
+      const taskElement = event.target.closest(".task");
+      const task = getTaskById(taskElement.id);
+      const newProjectId = event.target.options[event.target.options.selectedIndex].id;
+      moveTask(task, newProjectId);
+    }
+
     if (event.target.classList.contains("task--expanded")) {
       let task = getTaskById(Number(event.target.id));
       expandTask(task, event.target, false);
@@ -83,7 +92,7 @@ export default function loadListeners() {
     }
 
     if (event.target.classList.contains("task")) {
-      if (event.target.closest(".project").id === "-2") return;
+      if (event.target.closest(".project").id === config.done.id) return;
 
       let task = getTaskById(event.target.id);
 
@@ -97,7 +106,6 @@ export default function loadListeners() {
     }
 
     if (event.target.className === "edit") {
-
       toggleInput(event, "input");
     }
 
@@ -174,6 +182,10 @@ export default function loadListeners() {
       projectTitle.classList.add("editing");
     }
 
+    if (event.target.className === 'assigned-project' && event.target.closest('.task--expanded')) {
+      /* event.target.replaceWith(projectSelector()); */
+    }
+
     if (event.target.className === "newtask-date") {
       let todaysDate = new Date().toISOString().slice(0, 10);
       const newDate = createHtmlElement(
@@ -187,6 +199,7 @@ export default function loadListeners() {
           ["value", todaysDate],
         ]
       );
+
       if (!event.target.contains(newDate)) event.target.appendChild(newDate);
       console.log(event.target.value);
       if (event.target.value == "Set date") {
@@ -201,12 +214,11 @@ export default function loadListeners() {
       const project = event.target.closest(".project");
       const dueDate = document.querySelector(".newtask-date");
       const priority = document.querySelector(".newtask-priority");
-      const projectSelector = document.querySelector('.project-select');
-
+      const projectSelector = document.querySelector(".project-select");
 
       if (newTaskBar.value !== "" || description.value !== "") {
         addNewTask(
-          projectSelector.options[(projectSelector.selectedIndex)].id,
+          projectSelector.options[projectSelector.selectedIndex].id,
           newTaskBar.value,
           description.value,
           dueDate.value,

@@ -1,6 +1,10 @@
-import { getDoneProjectFromStorage, getProjectsFromStorage } from "./localStorage";
+import { config } from "./config";
+import {
+  getDoneProjectFromStorage,
+  getProjectsFromStorage,
+} from "./localStorage";
 import { createProject, addTask } from "./Project";
-import {createTask} from "./Task";
+import { createTask } from "./Task";
 import { display, main, update } from "./UI";
 
 let projects = [];
@@ -49,7 +53,7 @@ function initDefaultProjects() {
 
 function createDoneTasksProject() {
   done = createProject("Done");
-  done.id = -2;
+  done.id = config.done.id;
 }
 
 function getHomeProject() {
@@ -78,6 +82,14 @@ function addNewTask(projectId, title, description, dueDate, priority) {
 
   updateTasks();
   update();
+}
+
+function moveTask(task, newProjectId) {
+  const oldProject = getProjectById(task.project);
+  const newProject = getProjectById(newProjectId);
+  removeTask(task.id);
+  addTask(newProject, task);
+
 }
 
 function removeTask(id) {
@@ -138,7 +150,7 @@ function getProjectById(id) {
   id = Number(id);
 
   if (id === -1) return getHomeProject();
-  if (id === -2) return getDoneList();
+  if (id === config.done.id) return getDoneList();
 
   const project = projects.find((project) => project.id == id);
   return project;
@@ -197,4 +209,5 @@ export {
   getProjectById,
   getDoneList,
   toggleTaskCompletion,
+  moveTask
 };
