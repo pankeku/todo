@@ -6,6 +6,7 @@ import {
 import { createProject, addTask } from "./Project";
 import { createTask } from "./Task";
 import { display, main, update } from "./UI";
+import { updateNav } from "./ui-modules/nav";
 
 let projects = [];
 let homeProject;
@@ -67,7 +68,11 @@ function defaultProject() {
 
 function updateTasks() {
   homeProject.tasks = homeProject.tasks.filter(
-    (task) => getProjectById(task.project).title === homeProject.title
+    (task) => {
+      const project = getProjectById(task.project);
+      if (project) return project.title === homeProject.title;
+      return false;
+    }
   );
   homeProject.tasks = homeProject.tasks.concat(getAllTasks());
 }
@@ -85,24 +90,29 @@ function addNewTask(projectId, title, description, dueDate, priority) {
 }
 
 function moveTask(task, newProjectId) {
-  const oldProject = getProjectById(task.project);
   const newProject = getProjectById(newProjectId);
   removeTask(task.id);
   addTask(newProject, task);
-
+  updateTasks();
+  update();
 }
 
 function removeTask(id) {
   let task = getTaskById(id);
   let project = getProjectById(task.project);
   let index = getTaskIndex(task, project);
-  console.log(task);
-  console.log(index);
-  console.log(project);
-
   project.remove(index);
   updateTasks();
   update();
+}
+
+function removeProject(id) {
+  let project = getProjectById(id);
+  let index = getProjectIndex(project);
+  projects.splice(index, 1);
+  updateTasks();
+  updateNav();
+  display(homeProject);
 }
 
 function getTaskById(id, project) {
@@ -126,12 +136,6 @@ function getTaskById(id, project) {
   }
 
   return found;
-}
-
-function locateProject(projectIndex) {
-  let project = projects[projectIndex];
-
-  return project;
 }
 
 function getTaskIndex(task, project) {
@@ -209,5 +213,6 @@ export {
   getProjectById,
   getDoneList,
   toggleTaskCompletion,
-  moveTask
+  moveTask,
+  removeProject
 };

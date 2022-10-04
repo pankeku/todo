@@ -2,7 +2,7 @@ import { render as renderNav } from "./ui-modules/nav";
 import { displayProject, render as renderContent } from "./ui-modules/content";
 import { render as renderHeader } from "./ui-modules/header";
 import loadListeners from "./listeners";
-import { projects } from "./Manager";
+import { getProjectById, getTaskById, projects } from "./Manager";
 import { updateLocalStorage } from "./localStorage";
 
 let activeProject = [];
@@ -14,8 +14,45 @@ let content = renderContent();
 
 function display(project) {
   activeProject = project;
+
+ // sorter(project, 'project', 'down');
+
   displayProject(project);
   updateLocalStorage();
+}
+
+function sortByName(project) {
+  sorter(project, 'title', 'up');
+}
+
+function sorter(project, setting, order) {
+  activeProject.tasks.sort((a, b) => {
+
+    if (setting == 'project') {
+      titleA = getProjectById(a.project).title.toUpperCase();
+      titleB = getProjectById(b.project).title.toUpperCase();
+    }
+
+    let titleA = a[setting].toUpperCase();
+    let titleB = b[setting].toUpperCase();
+
+
+
+    if (order == 'down') {
+      const temp = titleA;
+      titleA = titleB;
+      titleB = temp;
+    }
+
+    if (titleA < titleB) {
+      return -1;
+    }
+    if (titleA > titleB) {
+      return 1;
+    }
+
+    return 0;
+  });
 }
 
 function main() {

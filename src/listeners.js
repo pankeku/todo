@@ -10,6 +10,7 @@ import {
   toggleTaskCompletion,
   getDoneList,
   moveTask,
+  removeProject,
 } from "./Manager";
 import { display, update, createHtmlElement } from "./UI";
 import {
@@ -180,6 +181,11 @@ export default function loadListeners() {
       projectTitle.setAttribute("contenteditable", "true");
       projectTitle.focus();
       projectTitle.classList.add("editing");
+    }
+
+    if (event.target.className === 'project-remove') {
+      const id = event.target.closest(".project").id;
+      removeProject(id);
     }
 
     if (event.target.className === 'assigned-project' && event.target.closest('.task--expanded')) {

@@ -9,6 +9,7 @@
   --p4-border-color: rgba(255, 69, 0, 0.8);
   --check-icon: url('data:image/svg+xml,<svg viewBox="0 0 16 16" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z"/></svg>');
   --edit-icon: url(../static/icons/edit.svg);
+  --remove-icon: url(../static/icons/delete.svg);
 }
 
 body {
@@ -214,14 +215,21 @@ input:focus {
   height: 30px;
 }
 
-.project-title-edit {
+.project-title-edit, .project-remove {
   display: none;
-  content: var(--edit-icon);
   width: 15px;
   height: 15px;
 }
 
-.project-title-wrapper:hover .project-title-edit {
+.project-title-edit {
+  content: var(--edit-icon);
+}
+
+.project-remove {
+  content: var(--remove-icon);
+}
+
+.project-title-wrapper:hover :is(.project-title-edit, .project-remove) {
 display: block;
 }
 
@@ -347,7 +355,7 @@ select:hover {
 }
 
 .remove {
-  content: url(../static/icons/delete.svg);
+  content: var(--remove-icon);
   width: 25px;
   height: 25px;
 }

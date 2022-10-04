@@ -293,6 +293,7 @@ function projectGenerator(project) {
   projectElement.appendChild(titleWrapper);
 
   projectTitleEditable(titleWrapper);
+  projectRemove(titleWrapper);
 
   return projectElement;
 }
@@ -313,6 +314,25 @@ function projectTitleEditable(titleElement) {
   );
 
   titleElement.appendChild(titleEdit);
+}
+
+function projectRemove(titleElement) {
+
+  if (
+    titleElement.closest(".project").id == -1 ||
+    titleElement.closest(".project").id == config.done.id
+  ) {
+    return;
+  }
+
+  const projectRemove = createHtmlElement(
+    "div",
+    null,
+    ["project-remove"],
+    ''
+  );
+
+  titleElement.appendChild(projectRemove);
 }
 
 function createTasks(project) {
@@ -429,7 +449,7 @@ function taskGenerator(task, setting) {
     dateAndPriorityWrapper.append(projectSelect);
 
     selectProjectForTask(projectSelect, task);
-    
+
     const leftWrapper = createHtmlElement("div", null, [
       "task-left-wrapper",
       "task-edit",
