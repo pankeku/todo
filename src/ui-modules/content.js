@@ -244,23 +244,41 @@ function taskContent() {
 }
 
 function clear() {
+
   content.replaceChildren();
 }
 
 function displayProject(project) {
-  clear();
 
-  let element = projectGenerator(project);
+  if (document.querySelector('.project')) {
+    document.querySelector('.project').classList.add('project--fading');
+  }
 
-  if (!isCompletedTasksProject(element)) element.append(task());
+  setTimeout(() => {
 
-  element.appendChild(generateSorterElement());
+    clear();
 
-  element.appendChild(createTasks(project));
+    let element = projectGenerator(project);
 
-  content.appendChild(element);
+    if (!isCompletedTasksProject(element)) element.append(task());
 
-  return element;
+    element.appendChild(generateSorterElement());
+
+    element.appendChild(createTasks(project));
+    content.appendChild(element);
+
+    element.classList.add('project--fading');
+
+setTimeout(() => {
+  element.classList.remove('project--fading');
+
+}, 100);
+
+
+    return element;
+  },100);
+
+
 }
 
 function isCompletedTasksProject(element) {

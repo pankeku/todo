@@ -14,6 +14,8 @@ const container = createHtmlElement("div", null, ["container"], null);
 let content = renderContent();
 
 function display(project) {
+
+
   activeProject = project;
 
 
@@ -21,6 +23,8 @@ function display(project) {
 
 
   displayProject(project);
+
+
   updateLocalStorage();
 }
 

@@ -201,6 +201,12 @@ input:focus {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  opacity: 1;
+  transition: opacity 0.1s;
+}
+
+.project--fading {
+  opacity: 0;
 }
 
 .project-header {
@@ -223,15 +229,13 @@ input:focus {
 
 .sort-icons-wrapper {
   display: flex;
-
 }
 
 .sort-arrow {
   content: url(../static/icons/arrow.svg);
   width: 15px;
   height: 15px;
-  cursor:pointer;
-
+  cursor: pointer;
 }
 
 .sort-arrow--up {
@@ -257,13 +261,15 @@ input:focus {
 
 #selected {
   display: block;
-  font-weight: 700;
+  font-size: 0.7rem;
+  text-transform: uppercase;
 }
 
 .sort-option {
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   cursor: pointer;
   display: none;
+  text-transform: uppercase;
 }
 
 .sort-option:hover {
@@ -273,6 +279,10 @@ input:focus {
 
 .project-sorter:hover .sort-option {
   display: flex;
+}
+
+.project-sorter:hover #selected {
+  font-weight: 700;
 }
 
 .project-title {
