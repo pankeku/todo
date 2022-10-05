@@ -65,7 +65,8 @@ body {
   align-items: center;
 }
 
-.newtask-right-wrapper, .close-wrapper {
+.newtask-right-wrapper,
+.close-wrapper {
   width: 50%;
 }
 
@@ -82,7 +83,6 @@ body {
 
 .task-close {
   font-size: 0.8rem;
-
 }
 
 .date-label {
@@ -96,8 +96,6 @@ body {
 .project-select-label {
   content: url(../static/icons/folder.svg);
 }
-
-
 
 .text-bar {
   font-weight: 700;
@@ -205,17 +203,86 @@ input:focus {
   gap: 10px;
 }
 
+.project-header {
+  display: flex;
+}
+
 .project-title-wrapper {
   display: flex;
   gap: 5px;
+  width: 50%;
 }
+
+.project-sorter-wrapper {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.sort-icons-wrapper {
+  display: flex;
+
+}
+
+.sort-arrow {
+  content: url(../static/icons/arrow.svg);
+  width: 15px;
+  height: 15px;
+  cursor:pointer;
+
+}
+
+.sort-arrow--up {
+  transform: rotate(180deg);
+}
+
+.sort-label {
+  content: url(../static/icons/sort.svg);
+  width: 20px;
+  height: 20px;
+}
+
+.project-sorter {
+  overflow: hidden;
+  display: flex;
+  gap: 20px;
+  transition: all 0.1s;
+}
+
+.project-sorter:hover {
+  gap: 5px;
+}
+
+#selected {
+  display: block;
+  font-weight: 700;
+}
+
+.sort-option {
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: none;
+}
+
+.sort-option:hover {
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.project-sorter:hover .sort-option {
+  display: flex;
+}
+
 .project-title {
   font-size: 1.3rem;
   font-weight: 700;
   height: 30px;
 }
 
-.project-title-edit, .project-remove {
+.project-title-edit,
+.project-remove {
   display: none;
   width: 15px;
   height: 15px;
@@ -230,7 +297,7 @@ input:focus {
 }
 
 .project-title-wrapper:hover :is(.project-title-edit, .project-remove) {
-display: block;
+  display: block;
 }
 
 .editing {
@@ -280,7 +347,6 @@ input[type="checkbox"] {
 }
 
 input[type="checkbox"]:hover {
-
   background-image: var(--check-icon);
 }
 
@@ -323,7 +389,7 @@ select:hover {
 }
 
 .priority-label {
-  content: url(../static/icons/priority.svg)
+  content: url(../static/icons/priority.svg);
 }
 
 .date-priority-wrapper {
@@ -429,8 +495,11 @@ textarea {
 }
 
 .assigned-project {
-  font-size: 1rem;
-  background-color: yellow;
+  cursor: default;
+  user-select: none;
+  font-size: 0.8rem;
+  background-color: black;
+  color: white;
   width: fit-content;
   height: fit-content;
   padding: 3px;

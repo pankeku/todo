@@ -21,6 +21,10 @@ import {
   setCheckBoxColor,
   setCheckBoxOutlineColor,
   projectSelector,
+  generateSorterElement,
+  expandSorterOptions,
+  changeSortCriteria,
+  changeSortOrder,
 } from "./ui-modules/content";
 import { updateNav } from "./ui-modules/nav";
 
@@ -63,6 +67,16 @@ export default function loadListeners() {
   });
 
   content.addEventListener("click", (event) => {
+
+    if(event.target.classList.contains('sort-arrow')) {
+
+      changeSortOrder(event.target);
+    }
+
+    if (event.target.className === 'sort-option') {
+      changeSortCriteria(event.target);
+    }
+
     if (
       event.target.className === "newtask-priority" &&
       event.target.closest(".task") !== null
@@ -78,10 +92,14 @@ export default function loadListeners() {
       setCheckBoxOutlineColor(checkbox, task);
     }
 
-    if (event.target.className === 'project-select' && event.target.closest('.task') !== null) {
+    if (
+      event.target.className === "project-select" &&
+      event.target.closest(".task") !== null
+    ) {
       const taskElement = event.target.closest(".task");
       const task = getTaskById(taskElement.id);
-      const newProjectId = event.target.options[event.target.options.selectedIndex].id;
+      const newProjectId =
+        event.target.options[event.target.options.selectedIndex].id;
       moveTask(task, newProjectId);
     }
 
@@ -120,12 +138,10 @@ export default function loadListeners() {
       const project = getProjectById(event.target.closest(".project").id);
       project.title = event.target.textContent;
 
-      console.log(project.title);
     }
 
     if (event.target.className === "task-title") {
       let task = getTask(event);
-      console.log(task);
       task.title = event.target.textContent;
     }
     if (event.target.className === "description") {
@@ -152,18 +168,19 @@ export default function loadListeners() {
         let task = getTaskById(taskElement.id);
         task.dueDate = date.value;
 
-        console.log(task.dueDate);
       }
     }
   });
 
   content.addEventListener("mouseover", (e) => {
+
     if (e.target.className === "task") {
       const task = getTaskById(e.target.id);
       const checkbox = e.target.querySelector(".complete");
       setCheckBoxOutlineColor(checkbox, task);
     }
   });
+
 
   content.addEventListener("focusout", (event) => {
     if (event.target.className === "project-title editing") {
@@ -183,13 +200,9 @@ export default function loadListeners() {
       projectTitle.classList.add("editing");
     }
 
-    if (event.target.className === 'project-remove') {
+    if (event.target.className === "project-remove") {
       const id = event.target.closest(".project").id;
       removeProject(id);
-    }
-
-    if (event.target.className === 'assigned-project' && event.target.closest('.task--expanded')) {
-      /* event.target.replaceWith(projectSelector()); */
     }
 
     if (event.target.className === "newtask-date") {

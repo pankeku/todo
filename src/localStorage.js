@@ -20,7 +20,6 @@ function getProjectNumber() {
 function getNumber(key) {
 
   if (!localStorage.getItem(key)) {
-    console.log('RETURNING 1')
     return 1;
   }
 

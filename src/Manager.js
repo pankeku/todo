@@ -78,8 +78,6 @@ function updateTasks() {
 }
 
 function addNewTask(projectId, title, description, dueDate, priority) {
-  console.log(getProjectById(projectId));
-
   addTask(
     getProjectById(projectId),
     createTask(title, description, dueDate, priority)

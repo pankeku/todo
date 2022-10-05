@@ -1,11 +1,12 @@
 import { render as renderNav } from "./ui-modules/nav";
-import { displayProject, render as renderContent } from "./ui-modules/content";
+import { activeSortOption, activeSortOrder, displayProject, render as renderContent } from "./ui-modules/content";
 import { render as renderHeader } from "./ui-modules/header";
 import loadListeners from "./listeners";
 import { getProjectById, getTaskById, projects } from "./Manager";
 import { updateLocalStorage } from "./localStorage";
 
 let activeProject = [];
+
 
 const mainContainer = createHtmlElement("div", null, ["main-container"], null);
 const header = renderHeader();
@@ -15,30 +16,42 @@ let content = renderContent();
 function display(project) {
   activeProject = project;
 
- // sorter(project, 'project', 'down');
+
+ sorter(project, activeSortOption, activeSortOrder);
+
 
   displayProject(project);
   updateLocalStorage();
 }
 
-function sortByName(project) {
-  sorter(project, 'title', 'up');
-}
-
 function sorter(project, setting, order) {
-  activeProject.tasks.sort((a, b) => {
+  project.tasks.sort((a, b) => {
 
-    if (setting == 'project') {
+    let titleA;
+    let titleB;
+
+    if (setting === 'name') {
+       titleA = a['title'].toUpperCase();
+      titleB = b['title'].toUpperCase();
+    }
+
+    if (setting === 'priority') {
+      titleA = a['priority'];
+      titleB = b['priority'];
+    }
+
+    if (setting === 'date') {
+      titleA = a['dueDate'];
+      titleB = b['dueDate'];
+    }
+
+    if (setting === 'project') {
       titleA = getProjectById(a.project).title.toUpperCase();
       titleB = getProjectById(b.project).title.toUpperCase();
     }
 
-    let titleA = a[setting].toUpperCase();
-    let titleB = b[setting].toUpperCase();
 
-
-
-    if (order == 'down') {
+    if (order == 'descending') {
       const temp = titleA;
       titleA = titleB;
       titleB = temp;

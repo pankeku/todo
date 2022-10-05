@@ -1,22 +1,18 @@
-import {
-  getProjectById,
-  getProjectIndex,
-  getProjectsTitles,
-  projects,
-} from "../Manager";
-import { activeProject, createHtmlElement, makeEditable } from "../UI";
-import isToday from "date-fns/isToday";
+import { getProjectById, getProjectsTitles } from "../Manager";
+import { activeProject, createHtmlElement, makeEditable, update } from "../UI";
 import { parseISO, formatDistanceToNow, isBefore } from "date-fns";
 import { config, priorityBorderColors, priorityColors } from "../config";
 
 const content = createHtmlElement("div", null, ["content"], null);
+let sortOptions = ["name", "priority", "date", "project"];
+let activeSortOption = "name";
+let activeSortOrder = 'ascending';
 
 function render() {
   return content;
 }
 
 function task() {
-
   const newTaskContainer = createHtmlElement(
     "div",
     null,
@@ -38,7 +34,7 @@ function task() {
   newTaskContainer.append(container);
   container.appendChild(textBar);
 
-return newTaskContainer;
+  return newTaskContainer;
 }
 
 function createDateInput(date) {
@@ -144,10 +140,10 @@ function handler() {
 }
 
 function selectProjectForTask(selectorElement, task) {
-  const options = selectorElement.querySelector('.project-select').options;
+  const options = selectorElement.querySelector(".project-select").options;
   for (let option in options) {
     if (options[option].id == task.project) {
-      options[option].setAttribute('selected', '');
+      options[option].setAttribute("selected", "");
     }
   }
 }
@@ -184,12 +180,11 @@ function projectSelector() {
         ["value", title],
       ]);
 
-       if (projectId == activeProject.id) {
+      if (projectId == activeProject.id) {
         option.setAttribute("selected", "");
       }
 
       if (projectId == -1) {
-
       }
 
       projectSelect.appendChild(option);
@@ -259,6 +254,8 @@ function displayProject(project) {
 
   if (!isCompletedTasksProject(element)) element.append(task());
 
+  element.appendChild(generateSorterElement());
+
   element.appendChild(createTasks(project));
 
   content.appendChild(element);
@@ -278,24 +275,82 @@ function projectGenerator(project) {
     null
   );
 
+  const headerWrapper = createHtmlElement("div", null, ["project-header"]);
+
   const titleWrapper = createHtmlElement("div", null, [
     "project-title-wrapper",
   ]);
+
   const projectTitle = createHtmlElement(
     "div",
     null,
     ["project-title"],
     project.title
   );
-
   titleWrapper.append(projectTitle);
 
-  projectElement.appendChild(titleWrapper);
+  headerWrapper.append(titleWrapper);
+
+  projectElement.appendChild(headerWrapper);
 
   projectTitleEditable(titleWrapper);
   projectRemove(titleWrapper);
 
   return projectElement;
+}
+
+function generateSorterElement() {
+  const sorterWrapper = createHtmlElement("div", null, [
+    "project-sorter-wrapper",
+  ]);
+
+  const sorter = createHtmlElement("div", "sorter", ["project-sorter"]);
+
+  const wrapper = createHtmlElement('div', null, ['sort-icons-wrapper']);
+  const sortArrow = createHtmlElement('div', null, ['sort-arrow']);
+
+  if (activeSortOrder === 'ascending') {
+    sortArrow.classList.add('sort-arrow--up');
+  }
+
+  const sortLabel = createHtmlElement("label", null, ["sort-label"], null, [
+    ["for", sorter.id],
+  ]);
+
+  wrapper.append(sortArrow, sortLabel);
+
+  sortOptions = sortOptions.filter((item) => item !== activeSortOption);
+  sortOptions.unshift(activeSortOption);
+
+  sortOptions.forEach((option) => {
+    const sortOption = createHtmlElement("div", null, ["sort-option"], option);
+    if (option == activeSortOption) sortOption.id = "selected";
+    sorter.append(sortOption);
+  });
+
+  sorterWrapper.append(wrapper, sorter);
+
+  return sorterWrapper;
+}
+
+function changeSortOrder() {
+
+  if (activeSortOrder === 'ascending') {
+    activeSortOrder = 'descending';
+    update();
+
+    return;
+  }
+
+  activeSortOrder = 'ascending';
+  update();
+}
+
+function changeSortCriteria(element) {
+  content.querySelector("#selected").id = "";
+  element.id = "selected";
+  activeSortOption = element.textContent;
+  update();
 }
 
 function projectTitleEditable(titleElement) {
@@ -317,7 +372,6 @@ function projectTitleEditable(titleElement) {
 }
 
 function projectRemove(titleElement) {
-
   if (
     titleElement.closest(".project").id == -1 ||
     titleElement.closest(".project").id == config.done.id
@@ -325,12 +379,7 @@ function projectRemove(titleElement) {
     return;
   }
 
-  const projectRemove = createHtmlElement(
-    "div",
-    null,
-    ["project-remove"],
-    ''
-  );
+  const projectRemove = createHtmlElement("div", null, ["project-remove"], "");
 
   titleElement.appendChild(projectRemove);
 }
@@ -508,5 +557,8 @@ export {
   expandTask,
   setCheckBoxColor,
   setCheckBoxOutlineColor,
-  projectSelector
+  projectSelector,
+  generateSorterElement,
+  changeSortCriteria,
+  activeSortOption,changeSortOrder, activeSortOrder
 };
