@@ -1,76 +1,25 @@
-import { render as renderNav } from "./ui-modules/nav";
-import { activeSortOption, activeSortOrder, displayProject, render as renderContent } from "./ui-modules/content";
+import {
+  getHomeProject,
+  getProjectById,
+  projectExists,
+  updateTasks,
+} from "./Manager";
+import {
+  sorter,
+  activeSortOption,
+  activeSortOrder,
+} from "./sorter";
+import { displayProject, render as renderContent } from "./ui-modules/content";
 import { render as renderHeader } from "./ui-modules/header";
-import loadListeners from "./listeners";
-import { getProjectById, getTaskById, projects } from "./Manager";
-import { updateLocalStorage } from "./localStorage";
+import { render as renderNav } from "./ui-modules/nav";
 
 let activeProject = [];
-
 
 const mainContainer = createHtmlElement("div", null, ["main-container"], null);
 const header = renderHeader();
 const container = createHtmlElement("div", null, ["container"], null);
 let content = renderContent();
 
-function display(project) {
-
-
-  activeProject = project;
-
-
- sorter(project, activeSortOption, activeSortOrder);
-
-
-  displayProject(project);
-
-
-  updateLocalStorage();
-}
-
-function sorter(project, setting, order) {
-  project.tasks.sort((a, b) => {
-
-    let titleA;
-    let titleB;
-
-    if (setting === 'name') {
-       titleA = a['title'].toUpperCase();
-      titleB = b['title'].toUpperCase();
-    }
-
-    if (setting === 'priority') {
-      titleA = a['priority'];
-      titleB = b['priority'];
-    }
-
-    if (setting === 'date') {
-      titleA = a['dueDate'];
-      titleB = b['dueDate'];
-    }
-
-    if (setting === 'project') {
-      titleA = getProjectById(a.project).title.toUpperCase();
-      titleB = getProjectById(b.project).title.toUpperCase();
-    }
-
-
-    if (order == 'descending') {
-      const temp = titleA;
-      titleA = titleB;
-      titleB = temp;
-    }
-
-    if (titleA < titleB) {
-      return -1;
-    }
-    if (titleA > titleB) {
-      return 1;
-    }
-
-    return 0;
-  });
-}
 
 function main() {
   document.body.appendChild(mainContainer);
@@ -79,6 +28,25 @@ function main() {
   const nav = renderNav();
   container.append(nav);
   container.append(content);
+}
+
+function display(project) {
+  if (!projectExists(project) || project.id == -1) {
+    updateTasks();
+    project = getHomeProject();
+  }
+
+  activeProject = project;
+
+  console.log(project);
+
+  sorter(project, activeSortOption, activeSortOrder);
+
+  displayProject(project);
+}
+
+function update() {
+  display(activeProject);
 }
 
 function createHtmlElement(type, id, arrayClasses, content, attributes) {
@@ -98,10 +66,6 @@ function createHtmlElement(type, id, arrayClasses, content, attributes) {
   }
 
   return element;
-}
-
-function update() {
-  display(activeProject);
 }
 
 export { main, update, display, container, createHtmlElement, activeProject };

@@ -7,42 +7,18 @@ function createProject(name = 'Project title') {
   let id = number++;
   let tasks = [];
 
-    function add(task) {
+  return {
+    title: title,
+    id: id,
+    tasks: tasks,
+    add: function (task) {
       tasks.push(task);
-    }
-
-    function remove (index) {
+    },
+    remove: function (index) {
       if (index > -1) {
         return tasks.splice(index, 1);
       }
     }
-
-  return {
-    get title() {
-      return title;
-    },
-
-    set title(value) {
-      title = value;
-    },
-
-    set id(value) {
-      id = value;
-    },
-
-    get id() {
-      return id;
-    }
-    ,
-
-    get tasks() {
-      return tasks;
-    },
-
-    set tasks(value) {
-      tasks = value;
-    },
-    add, remove
   };
 }
 

@@ -2,34 +2,19 @@ import { getTaskNumber } from "./localStorage";
 
 let number = getTaskNumber();
 
-function createTask(title1, description, dueDate, priority) {
+function createTask(title, description, dueDate, priority) {
   let project;
   let id = number++;
-  let title = title1;
-  let completed = false;
-  return {
-    get title() {
-      return title;
-    },
-    set title(value) {
-      title = value;
-    },
-    set completed(value) {
-      completed = value;
-    }
-    ,
-    get completed() {
-      return completed;
-    }
 
-    ,
-    description,
-    dueDate,
-    priority,
-    project,
-    id,
-    completed
+  return {
+    title: title,
+    completed: false,
+    description: description,
+    dueDate: dueDate,
+    priority: priority,
+    project: project,
+    id: id,
   };
 }
 
-export {number, createTask};
+export { number, createTask };

@@ -3,10 +3,11 @@ import { number as projectNumber } from "./Project";
 import { number as taskNumber } from "./Task";
 
 function updateLocalStorage() {
+   console.warn('UPDATING LOCAL STORAGE');
   localStorage.setItem("projects", JSON.stringify(projects));
   localStorage.setItem("done", JSON.stringify(done));
   localStorage.setItem("taskNumber", taskNumber);
-  localStorage.setItem("projectNumber", projectNumber);
+  localStorage.setItem("projectNumber", projectNumber); 
 }
 
 function getTaskNumber() {

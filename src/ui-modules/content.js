@@ -1,12 +1,11 @@
-import { getProjectById, getProjectsTitles } from "../Manager";
-import { activeProject, createHtmlElement, makeEditable, update } from "../UI";
-import { parseISO, formatDistanceToNow, isBefore } from "date-fns";
+import { formatDistanceToNow, isBefore, parseISO } from "date-fns";
 import { config, priorityBorderColors, priorityColors } from "../config";
+import { getProjectById, getProjectsTitles } from "../Manager";
+import { activeSortOption, activeSortOrder, sortOptions } from "../sorter";
+import { activeProject, createHtmlElement, update } from "../UI";
+
 
 const content = createHtmlElement("div", null, ["content"], null);
-let sortOptions = ["name", "priority", "date", "project"];
-let activeSortOption = "name";
-let activeSortOrder = 'ascending';
 
 function render() {
   return content;
@@ -336,11 +335,12 @@ function generateSorterElement() {
   ]);
 
   wrapper.append(sortArrow, sortLabel);
+let options = sortOptions;
 
-  sortOptions = sortOptions.filter((item) => item !== activeSortOption);
-  sortOptions.unshift(activeSortOption);
+ options = options.filter((item) => item !== activeSortOption);
+  options.unshift(activeSortOption);
 
-  sortOptions.forEach((option) => {
+  options.forEach((option) => {
     const sortOption = createHtmlElement("div", null, ["sort-option"], option);
     if (option == activeSortOption) sortOption.id = "selected";
     sorter.append(sortOption);
@@ -349,26 +349,6 @@ function generateSorterElement() {
   sorterWrapper.append(wrapper, sorter);
 
   return sorterWrapper;
-}
-
-function changeSortOrder() {
-
-  if (activeSortOrder === 'ascending') {
-    activeSortOrder = 'descending';
-    update();
-
-    return;
-  }
-
-  activeSortOrder = 'ascending';
-  update();
-}
-
-function changeSortCriteria(element) {
-  content.querySelector("#selected").id = "";
-  element.id = "selected";
-  activeSortOption = element.textContent;
-  update();
 }
 
 function projectTitleEditable(titleElement) {
@@ -435,18 +415,6 @@ function addEditButton(element) {
   element.appendChild(edit);
 }
 
-function expandTask(task, taskElement, expand) {
-  let newElement;
-  if (!expand) {
-    newElement = taskGenerator(task);
-    taskElement.replaceWith(newElement);
-    return;
-  }
-  newElement = taskGenerator(task, "expanded");
-  newElement.classList.add("task--expanded");
-  taskElement.replaceWith(newElement);
-}
-
 function addCheckBox(task, taskElement) {
   const checkbox = createHtmlElement("input", null, ["complete"], null, [
     ["type", "checkbox"],
@@ -473,6 +441,7 @@ function taskGenerator(task, setting) {
       [["contenteditable", "true"]],
     ];
   }
+
 
   addCheckBox(task, taskElement);
 
@@ -572,11 +541,9 @@ export {
   taskGenerator,
   handler,
   task,
-  expandTask,
   setCheckBoxColor,
   setCheckBoxOutlineColor,
   projectSelector,
   generateSorterElement,
-  changeSortCriteria,
-  activeSortOption,changeSortOrder, activeSortOrder
 };
+
