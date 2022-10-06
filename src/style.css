@@ -327,6 +327,7 @@ input:focus {
 }
 
 .task:hover {
+  outline: 1px solid rgba(0, 128, 0, 0.1);
 }
 
 .save {
@@ -454,6 +455,18 @@ select:hover {
   gap: 5px;
 }
 
+
+.task-left-wrapper{
+pointer-events: none;
+}
+
+.task-edit {
+  pointer-events:all;
+}
+
+
+
+
 .input-text-wrapper :is(.task-title, .description) {
   border: none;
   background-image: none;
@@ -481,6 +494,7 @@ textarea {
   font-size: 1rem;
   padding: 5px;
   outline: 0px;
+  width: fit-content;
 }
 
 .task--expanded :is(.edit, .remove) {
@@ -502,6 +516,11 @@ textarea {
   font-size: 0.8rem;
   padding: 5px;
   outline: 0px;
+  width: fit-content;
+}
+
+.task-edit :is(.task-title, .description) {
+  width: auto;
 }
 
 .assigned-project {

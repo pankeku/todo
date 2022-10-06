@@ -1,4 +1,5 @@
 import { config, priorityBorderColors, priorityColors } from "./config";
+import { updateLocalStorage } from "./localStorage";
 import {
   getTaskById,
   newProject,
@@ -55,13 +56,6 @@ export default function loadListeners() {
 
       task = getTaskById(Number(event.target.closest(".task").id));
 
-      /* if (!event.target.checked)
-        task = getTaskById(
-          Number(event.target.closest(".task").id),
-          getDoneList()
-        ); */
-
-      console.log("CALLING TOGGLE TASK COMPLETION METHOD");
       toggleTaskCompletion(task);
     }
   });
@@ -170,6 +164,8 @@ export default function loadListeners() {
 
       }
     }
+
+    updateLocalStorage();
   });
 
   content.addEventListener("mouseover", (e) => {
@@ -273,6 +269,7 @@ function toggleInput(event, setting) {
     save.textContent = "Close";
     taskElement.appendChild(save);
   }
+
 }
 
 function getTaskId(event) {
