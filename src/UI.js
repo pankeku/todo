@@ -1,52 +1,67 @@
 import {
   getHomeProject,
   getProjectById,
+  getUpdatedHomeProject,
   projectExists,
   updateTasks,
 } from "./Manager";
-import {
-  sorter,
-  activeSortOption,
-  activeSortOrder,
-} from "./sorter";
+import { sorter, activeSortOption, activeSortOrder } from "./sorter";
 import { displayProject, render as renderContent } from "./ui-modules/content";
 import { render as renderHeader } from "./ui-modules/header";
 import { render as renderNav } from "./ui-modules/nav";
 
 let activeProject = [];
 
-const mainContainer = createHtmlElement("div", null, ["main-container"], null);
-const header = renderHeader();
-const container = createHtmlElement("div", null, ["container"], null);
-let content = renderContent();
+function initUI() {
+  const header = renderHeader();
+  const nav = renderNav();
+  const content = renderContent();
 
-
-function main() {
+  const mainContainer = createHtmlElement("div", null, ["main-container"], null);
   document.body.appendChild(mainContainer);
+
+  const container = createHtmlElement("div", null, ["container"], null);
   mainContainer.append(header, container);
 
-  const nav = renderNav();
+
   container.append(nav);
   container.append(content);
 }
 
 function display(project) {
   if (!projectExists(project) || project.id == -1) {
-    updateTasks();
-    project = getHomeProject();
+    project = getUpdatedHomeProject();
   }
 
   activeProject = project;
 
-  console.log(project);
-
   sorter(project, activeSortOption, activeSortOrder);
 
-  displayProject(project);
+  fadeDisplay(displayProject, project);
 }
 
 function update() {
   display(activeProject);
+}
+
+function fadeDisplay(displayFunction, project) {
+  const pastProject = document.querySelector(".project");
+
+  if (pastProject) {
+    document.querySelector(".project").classList.add("project--fading");
+  }
+
+  setTimeout(() => {
+    displayFunction(project);
+
+    const newProject = document.querySelector(".project");
+
+    newProject.classList.add("project--fading");
+
+    setTimeout(() => {
+      newProject.classList.remove("project--fading");
+    }, 100);
+  }, 100);
 }
 
 function createHtmlElement(type, id, arrayClasses, content, attributes) {
@@ -68,4 +83,4 @@ function createHtmlElement(type, id, arrayClasses, content, attributes) {
   return element;
 }
 
-export { main, update, display, container, createHtmlElement, activeProject };
+export { initUI, update, display, createHtmlElement, activeProject };

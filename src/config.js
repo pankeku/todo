@@ -1,12 +1,14 @@
 let config = {
     page: {
-        title: 'Notes',
+        title: 'Tasks',
     },
     done: {
       title: '',
       id: -2,
-    }
+    },
+    priorities: ["P1", "P2", "P3", "P4"],
 };
+
 
 const priorityColors = {'P1' : '--p1-color',
 'P2' : '--p2-color',

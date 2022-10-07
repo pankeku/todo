@@ -1,9 +1,8 @@
-import { formatDistanceToNow, isBefore, parseISO } from "date-fns";
 import { config, priorityBorderColors, priorityColors } from "../config";
+import { dueDateChecker } from "../helper";
 import { getProjectById, getProjectsTitles } from "../Manager";
 import { activeSortOption, activeSortOrder, sortOptions } from "../sorter";
-import { activeProject, createHtmlElement, update } from "../UI";
-
+import { activeProject, createHtmlElement } from "../UI";
 
 const content = createHtmlElement("div", null, ["content"], null);
 
@@ -11,7 +10,22 @@ function render() {
   return content;
 }
 
-function task() {
+function displayProject(project) {
+  clearContentElement();
+  renderProject(project);
+}
+
+function renderProject(project) {
+  const projectEl = generateProjectElement(project);
+
+  if (!(project.id == config.done.id)) projectEl.append(generateNewTaskBar());
+
+  projectEl.append(generateTasksSorterElement(), generateTasks(project));
+
+  content.append(projectEl);
+}
+
+function generateNewTaskBar() {
   const newTaskContainer = createHtmlElement(
     "div",
     null,
@@ -36,32 +50,187 @@ function task() {
   return newTaskContainer;
 }
 
-function createDateInput(date) {
+function generateProjectElement(project) {
+  const projectElement = createHtmlElement(
+    "div",
+    project.id,
+    ["project"],
+    null
+  );
+
+  const headerWrapper = createHtmlElement("div", null, ["project-header"]);
+
+  const titleWrapper = createHtmlElement("div", null, [
+    "project-title-wrapper",
+  ]);
+
+  const projectTitle = createHtmlElement(
+    "div",
+    null,
+    ["project-title"],
+    project.title
+  );
+  titleWrapper.append(projectTitle);
+
+  headerWrapper.append(titleWrapper);
+
+  projectElement.appendChild(headerWrapper);
+
+  //as paskaites apie single-responsibility ir dependency inversion, ir biski apie composition, vis galvoju, kad tokius zemiau esancius metodus reiktu callint is isores, kad pvz. cia generateProjectElement() nebutu priklausomas nuo situ dvieju metodu. Ideja tokia, kad tiems dviems metodams passinu projectElement, kuri dabar generateProjectElement() returnina. Tada passintam parente pagal savo vidine logika jie susirastu ko jiems reikia ir patys pridetu savo elementus. Arba vapse jiems nieko nepassinu, tada kai buna pacallinti, jie susiranda parentElement per querySelector ir visi metodai gyvena sau atskirai ir laimingai.
+  //bet tada atrodo daaaug daugiau kodo bus, ir, kas man atrodo svarbu, daug daugiau resursu isnaudota bus, nors as srity performance vs maintanable and readable code nesigaudau :D ka manai?
+
+  addProjectTitleEditElement(titleWrapper);
+  addProjectRemoveElement(titleWrapper);
+
+  return projectElement;
+}
+
+function addProjectTitleEditElement(titleElement) {
+  if (
+    titleElement.closest(".project").id == -1 ||
+    titleElement.closest(".project").id == config.done.id
+  ) {
+    return;
+  }
+
+  const titleEdit = createHtmlElement(
+    "div",
+    null,
+    ["project-title-edit"],
+    null
+  );
+
+  titleElement.appendChild(titleEdit);
+}
+
+function addProjectRemoveElement(titleElement) {
+  if (
+    titleElement.closest(".project").id == -1 ||
+    titleElement.closest(".project").id == config.done.id
+  ) {
+    return;
+  }
+
+  const projectRemove = createHtmlElement("div", null, ["project-remove"], "");
+
+  titleElement.appendChild(projectRemove);
+}
+
+function generateTasks(project) {
+  const taskList = project.tasks;
+  const tasksElement = createHtmlElement("div", null, ["tasks"]);
+
+  taskList.forEach((task) => {
+    let element = generateTaskElement(task);
+
+    tasksElement.append(element);
+
+    element.addEventListener("click", () => {});
+  });
+
+  return tasksElement;
+}
+
+function generateTaskElement(task) {
+  const taskElement = createHtmlElement("div", task.id, ["task"], null);
+
+  addCheckBox(task, taskElement);
+
+  const title = createHtmlElement("div", null, ["task-title"], task.title);
+
+  const dueStatus = createHtmlElement(
+    "div",
+    null,
+    ["due-status"],
+    dueDateChecker(task.dueDate)
+  );
+
+  let assignedProject = createHtmlElement(
+    "div",
+    null,
+    ["assigned-project"],
+    getProjectById(task.project).title
+  );
+
+  const leftWrapper = createHtmlElement("div", null, ["task-content-wrapper"]);
+  leftWrapper.append(title, dueStatus);
+
+  taskElement.append(leftWrapper, assignedProject);
+
+  addTaskActionsElement(taskElement);
+
+  return taskElement;
+}
+
+function generateExpandedTaskElement(task) {
+  const taskElement = generateTaskElement(task);
+  const leftWrapper = taskElement.querySelector(".task-content-wrapper");
+  leftWrapper.replaceChildren();
+
+  const title = createHtmlElement("div", null, ["task-title"], task.title);
+
+  const description = createHtmlElement(
+    "div",
+    null,
+    ["description"],
+    task.description
+  );
+
+  const dateAndPriorityWrapper = createHtmlElement("div", null, [
+    "task-properties-wrapper",
+  ]);
+
+  let projectSelector = generateProjectSelectElement();
+
+  showAssignedProjectInSelector(projectSelector, task);
+
+  dateAndPriorityWrapper.append(
+    generateTaskDateElements(task),
+    generateTaskPriorityElements(task),
+    projectSelector
+  );
+
+  const textWrapper = createHtmlElement("div", null, ["input-text-wrapper"]);
+
+  textWrapper.append(title, description);
+
+  leftWrapper.append(textWrapper);
+  taskElement.append(dateAndPriorityWrapper);
+  taskElement.classList.add("task--expanded");
+
+  return taskElement;
+}
+
+function generateTaskWithInput(task) {
+  let taskElement = generateExpandedTaskElement(task);
+  const leftWrapper = taskElement.querySelector(".task-content-wrapper");
+  const title = leftWrapper.querySelector(".task-title");
+  const description = leftWrapper.querySelector(".description");
+
+  leftWrapper.classList.add("task-edit");
+
+  title.setAttribute("contenteditable", "true");
+  title.setAttribute("autofocus", "");
+
+  description.setAttribute("contenteditable", "true");
+
+  return taskElement;
+}
+
+function createDateInputElement(date) {
   if (!date) date = "Due date";
 
-  const newDate = createHtmlElement("input", "date", ["newtask-date"], "Date", [
+  const newDate = createHtmlElement("input", "date", ["new-task-date"], "Date", [
     ["type", "text"],
     ["value", date],
     ["name", "date"],
     ["title", "Set due date"],
   ]);
+
   return newDate;
 }
 
-function dueDateChecker(date) {
-  date = parseISO(date);
-
-  if (date == "Invalid Date") return;
-  let result = formatDistanceToNow(date);
-
-  let status = isBefore(date, new Date())
-    ? `${result} overdue`
-    : `due in ${result}`;
-
-  return status;
-}
-
-function prioritySelector(taskPriority) {
+function generateTaskPrioritySelectorElement(taskPriority) {
   const priority = createHtmlElement(
     "select",
     "priority-select",
@@ -72,7 +241,8 @@ function prioritySelector(taskPriority) {
       ["title", "Set priority"],
     ]
   );
-  const priorities = ["P1", "P2", "P3", "P4"];
+
+  const priorities = config.priorities;
 
   priorities.forEach((P) => {
     const option = createHtmlElement("option", null, null, P, [["value", P]]);
@@ -99,46 +269,7 @@ function setCheckBoxOutlineColor(element, task) {
   element.style.outlineColor = `var(${priorityBorderColors[task.priority]})`;
 }
 
-function handler() {
-  let taskContainer = document.querySelector(".task-container");
-  let container = document.querySelector(".task-inside-container");
-  const description = createHtmlElement(
-    "input",
-    null,
-    ["new-description"],
-    null,
-    [["placeholder", "Description"]]
-  );
-  const taskFooter = createHtmlElement("div", null, ["newtask-footer"], null);
-
-  const leftWrapper = createHtmlElement(
-    "div",
-    null,
-    ["newtask-left-wrapper"],
-    null
-  );
-  const titleBar = document.querySelector(".text-bar");
-  titleBar.setAttribute("placeholder", "Title");
-  titleBar.setAttribute("autofocus", "");
-
-  leftWrapper.append(titleBar, description);
-
-  const dateAndPriorityContainer = generateDateAndPriority();
-
-  const projectSelection = projectSelector();
-  dateAndPriorityContainer.append(projectSelection);
-
-  taskContainer.classList.add("task-container--expand");
-
-  if (container.lastChild === document.querySelector(".text-bar")) {
-    container.append(leftWrapper);
-    taskContainer.appendChild(taskFooter);
-    taskFooter.appendChild(dateAndPriorityContainer);
-    taskFooter.appendChild(taskContent());
-  }
-}
-
-function selectProjectForTask(selectorElement, task) {
+function showAssignedProjectInSelector(selectorElement, task) {
   const options = selectorElement.querySelector(".project-select").options;
   for (let option in options) {
     if (options[option].id == task.project) {
@@ -147,7 +278,7 @@ function selectProjectForTask(selectorElement, task) {
   }
 }
 
-function projectSelector() {
+function generateProjectSelectElement() {
   const projectSelectWrapper = createHtmlElement("div", null, [
     "project-select-wrapper",
   ]);
@@ -183,9 +314,6 @@ function projectSelector() {
         option.setAttribute("selected", "");
       }
 
-      if (projectId == -1) {
-      }
-
       projectSelect.appendChild(option);
     }
   });
@@ -195,21 +323,17 @@ function projectSelector() {
   return projectSelectWrapper;
 }
 
-function generateDateAndPriority(task) {
+function generateTaskPriorityElements(task) {
   let priority = "P1";
-  let dateSetting = false;
 
   if (task) {
     priority = task.priority;
-    dateSetting = task.dueDate;
   }
-
-  const container = createHtmlElement("div", null, ["newtask-right-wrapper"]);
 
   const priorityWrapper = createHtmlElement("div", null, ["priority-wrapper"]);
 
-  const newPriority = prioritySelector(priority);
-  newPriority.className = "newtask-priority";
+  const newPriority = generateTaskPrioritySelectorElement(priority);
+  newPriority.className = "new-task-priority";
 
   const priorityLabel = createHtmlElement(
     "div",
@@ -221,113 +345,39 @@ function generateDateAndPriority(task) {
 
   priorityWrapper.append(priorityLabel, newPriority);
 
-  const dateWrapper = createHtmlElement("div", null, ["newtask-date-wrapper"]);
+  return priorityWrapper;
+}
 
-  const date = createDateInput(dateSetting);
+function generateTaskDateElements(task) {
+  let dateSetting = false;
+  if (task) {
+    dateSetting = task.dueDate;
+  }
+
+  const dateWrapper = createHtmlElement("div", null, ["task-date-wrapper"]);
+
+  const date = createDateInputElement(dateSetting);
 
   const dateLabel = createHtmlElement("div", null, ["date-label"], "Due date", [
     ["for", date.id],
   ]);
   dateWrapper.append(dateLabel, date);
 
-  container.append(dateWrapper, priorityWrapper);
-
-  return container;
+  return dateWrapper;
 }
 
-function taskContent() {
-  const wrapper = createHtmlElement("div", null, ["close-wrapper"]);
-  const close = createHtmlElement("div", null, ["task-close"], "Close");
-  wrapper.appendChild(close);
-  return wrapper;
-}
-
-function clear() {
-
-  content.replaceChildren();
-}
-
-function displayProject(project) {
-
-  if (document.querySelector('.project')) {
-    document.querySelector('.project').classList.add('project--fading');
-  }
-
-  setTimeout(() => {
-
-    clear();
-
-    let element = projectGenerator(project);
-
-    if (!isCompletedTasksProject(element)) element.append(task());
-
-    element.appendChild(generateSorterElement());
-
-    element.appendChild(createTasks(project));
-    content.appendChild(element);
-
-    element.classList.add('project--fading');
-
-setTimeout(() => {
-  element.classList.remove('project--fading');
-
-}, 100);
-
-
-    return element;
-  },100);
-
-
-}
-
-function isCompletedTasksProject(element) {
-  return element.id == config.done.id;
-}
-
-function projectGenerator(project) {
-  const projectElement = createHtmlElement(
-    "div",
-    project.id,
-    ["project"],
-    null
-  );
-
-  const headerWrapper = createHtmlElement("div", null, ["project-header"]);
-
-  const titleWrapper = createHtmlElement("div", null, [
-    "project-title-wrapper",
-  ]);
-
-  const projectTitle = createHtmlElement(
-    "div",
-    null,
-    ["project-title"],
-    project.title
-  );
-  titleWrapper.append(projectTitle);
-
-  headerWrapper.append(titleWrapper);
-
-  projectElement.appendChild(headerWrapper);
-
-  projectTitleEditable(titleWrapper);
-  projectRemove(titleWrapper);
-
-  return projectElement;
-}
-
-function generateSorterElement() {
+function generateTasksSorterElement() {
   const sorterWrapper = createHtmlElement("div", null, [
     "project-sorter-wrapper",
   ]);
 
   const sorter = createHtmlElement("div", "sorter", ["project-sorter"]);
 
-  const wrapper = createHtmlElement('div', null, ['sort-icons-wrapper']);
-  const sortArrow = createHtmlElement('div', null, ['sort-arrow']);
+  const wrapper = createHtmlElement("div", null, ["sort-icons-wrapper"]);
+  const sortArrow = createHtmlElement("div", null, ["sort-arrow"]);
 
-  if (activeSortOrder === 'ascending') {
-    sortArrow.classList.add('sort-arrow--up');
+  if (activeSortOrder === "ascending") {
+    sortArrow.classList.add("sort-arrow--up");
   }
 
   const sortLabel = createHtmlElement("label", null, ["sort-label"], null, [
@@ -335,9 +385,9 @@ function generateSorterElement() {
   ]);
 
   wrapper.append(sortArrow, sortLabel);
-let options = sortOptions;
+  let options = sortOptions;
 
- options = options.filter((item) => item !== activeSortOption);
+  options = options.filter((item) => item !== activeSortOption);
   options.unshift(activeSortOption);
 
   options.forEach((option) => {
@@ -351,55 +401,9 @@ let options = sortOptions;
   return sorterWrapper;
 }
 
-function projectTitleEditable(titleElement) {
-  if (
-    titleElement.closest(".project").id == -1 ||
-    titleElement.closest(".project").id == config.done.id
-  ) {
-    return;
-  }
 
-  const titleEdit = createHtmlElement(
-    "div",
-    null,
-    ["project-title-edit"],
-    null
-  );
 
-  titleElement.appendChild(titleEdit);
-}
-
-function projectRemove(titleElement) {
-  if (
-    titleElement.closest(".project").id == -1 ||
-    titleElement.closest(".project").id == config.done.id
-  ) {
-    return;
-  }
-
-  const projectRemove = createHtmlElement("div", null, ["project-remove"], "");
-
-  titleElement.appendChild(projectRemove);
-}
-
-function createTasks(project) {
-  const taskList = project.tasks;
-
-  const tasksElement = document.createElement("div");
-  tasksElement.classList.add("tasks");
-
-  taskList.forEach((task) => {
-    let element = taskGenerator(task);
-
-    tasksElement.append(element);
-
-    element.addEventListener("click", () => {});
-  });
-
-  return tasksElement;
-}
-
-function addRemoveButton(element) {
+function addTaskRemoveElement(element) {
   const remove = document.createElement("div");
   remove.classList.add("remove");
   remove.textContent = "Remove";
@@ -407,7 +411,7 @@ function addRemoveButton(element) {
   element.appendChild(remove);
 }
 
-function addEditButton(element) {
+function addTaskEditElement(element) {
   const edit = document.createElement("div");
   edit.classList.add("edit");
   edit.textContent = "Edit";
@@ -425,125 +429,31 @@ function addCheckBox(task, taskElement) {
   checkbox.checked = task.completed;
 }
 
-function taskGenerator(task, setting) {
-  const taskElement = createHtmlElement("div", task.id, ["task"], null);
+function addTaskActionsElement(element) {
+  const actionsWrapper = createHtmlElement("div", null, [
+    "task-actions-wrapper",
+  ]);
 
-  let type = "div";
-  let attributes = [[], []];
+  addTaskEditElement(actionsWrapper);
+  addTaskRemoveElement(actionsWrapper);
 
-  if (setting === "input") {
-    type = "div";
-    attributes = [
-      [
-        ["contenteditable", "true"],
-        ["autofocus", ""],
-      ],
-      [["contenteditable", "true"]],
-    ];
-  }
+  element.append(actionsWrapper);
+}
 
-
-  addCheckBox(task, taskElement);
-
-  const title = createHtmlElement(
-    type,
-    null,
-    ["task-title"],
-    task.title,
-    attributes[0]
-  );
-
-  const description = createHtmlElement(
-    type,
-    null,
-    ["description"],
-    task.description,
-    attributes[1]
-  );
-
-  const dueStatus = createHtmlElement(
-    "div",
-    null,
-    ["due-status"],
-    dueDateChecker(task.dueDate)
-  );
-
-  let assignedProject = createHtmlElement(
-    "div",
-    null,
-    ["assigned-project"],
-    getProjectById(task.project).title
-  );
-
-  const dateAndPriorityWrapper = generateDateAndPriority(task);
-
-  const leftWrapper = createHtmlElement("div", null, ["task-left-wrapper"]);
-  leftWrapper.append(title, dueStatus);
-
-  if (setting === "input") {
-    const projectSelect = projectSelector();
-    dateAndPriorityWrapper.append(projectSelect);
-
-    selectProjectForTask(projectSelect, task);
-
-    const leftWrapper = createHtmlElement("div", null, [
-      "task-left-wrapper",
-      "task-edit",
-    ]);
-    const textWrapper = createHtmlElement("div", null, ["input-text-wrapper"]);
-    textWrapper.append(title, description);
-
-    leftWrapper.append(textWrapper);
-    taskElement.append(leftWrapper, dateAndPriorityWrapper, assignedProject);
-    closedTaskActions(taskElement);
-
-    return taskElement;
-  }
-
-  if (setting === "expanded") {
-    const projectSelect = projectSelector();
-    dateAndPriorityWrapper.append(projectSelect);
-
-    selectProjectForTask(projectSelect, task);
-
-    const leftWrapper = createHtmlElement("div", null, ["task-left-wrapper"]);
-    const textWrapper = createHtmlElement("div", null, ["input-text-wrapper"]);
-    textWrapper.append(title, description);
-
-    leftWrapper.append(textWrapper);
-    taskElement.append(leftWrapper, dateAndPriorityWrapper);
-    closedTaskActions(taskElement);
-
-    return taskElement;
-  }
-
-  taskElement.append(leftWrapper, assignedProject);
-
-  closedTaskActions(taskElement);
-
-  function closedTaskActions(element) {
-    const actionsWrapper = createHtmlElement("div", null, [
-      "task-actions-wrapper",
-    ]);
-
-    addEditButton(actionsWrapper);
-    addRemoveButton(actionsWrapper);
-
-    element.append(actionsWrapper);
-  }
-
-  return taskElement;
+function clearContentElement() {
+  content.replaceChildren();
 }
 
 export {
   render,
   displayProject,
-  taskGenerator,
-  handler,
-  task,
+  generateTaskElement,
+  generateNewTaskBar,
   setCheckBoxColor,
   setCheckBoxOutlineColor,
-  projectSelector,
-  generateSorterElement,
+  generateProjectSelectElement,
+  generateTaskPriorityElements,
+  generateTaskDateElements,
+  generateExpandedTaskElement,
+  generateTaskWithInput,
 };
-

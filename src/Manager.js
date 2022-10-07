@@ -6,7 +6,7 @@ import {
 } from "./localStorage";
 import { createProject, addTask } from "./Project";
 import { createTask } from "./Task";
-import { display, main, update } from "./UI";
+import { display, initUI, update } from "./UI";
 import { updateNav } from "./ui-modules/nav";
 
 let projects = [];
@@ -15,7 +15,7 @@ let done;
 
 function init() {
   initDefaultProjects();
-  main();
+  initUI();
   updateTasks();
   display(homeProject);
 }

@@ -12,11 +12,15 @@ import {
 } from "../../Manager";
 import { createHtmlElement, update } from "../../UI";
 import {
-  handler,
   setCheckBoxColor,
   setCheckBoxOutlineColor,
-  task,
-  taskGenerator,
+  generateNewTaskBar,
+  generateTaskElement,
+  generateProjectSelectElement,
+  generateTaskPriorityElements,
+  generateTaskDateElements,
+  generateExpandedTaskElement,
+  generateTaskWithInput,
 } from "../content";
 import { updateNav } from "../nav";
 
@@ -27,7 +31,7 @@ function markTaskDoneHandler(event) {
 }
 
 function changeTaskDueDateHandler(event) {
-  const date = event.target.closest(".newtask-date");
+  const date = event.target.closest(".new-task-date");
   date.value = event.target.value;
 
   let taskElement = event.target.closest(".task");
@@ -55,7 +59,7 @@ function popUpDatePickerHandler(event) {
   const newDate = createHtmlElement(
     "input",
     null,
-    ["newtask-date-picker"],
+    ["new-task-date-picker"],
     "Date",
     [
       ["type", "date"],
@@ -75,8 +79,8 @@ function popUpDatePickerHandler(event) {
 function closingNewTaskBarHandler(event) {
   const description = document.querySelector(".new-description");
   let newTaskBar = document.querySelector(".text-bar");
-  const dueDate = document.querySelector(".newtask-date");
-  const priority = document.querySelector(".newtask-priority");
+  const dueDate = document.querySelector(".new-task-date");
+  const priority = document.querySelector(".new-task-priority");
   const projectSelector = document.querySelector(".project-select");
 
   if (newTaskBar.value !== "" || description.value !== "") {
@@ -94,12 +98,58 @@ function closingNewTaskBarHandler(event) {
 
   const taskContainer = document.querySelector(".task-container");
 
-  taskContainer.replaceWith(task());
+  taskContainer.replaceWith(generateNewTaskBar());
 }
 
 function expandingNewTaskBarHandler(event) {
   event.target.classList.add("open");
-  handler();
+  let taskContainer = document.querySelector(".task-container");
+  let container = document.querySelector(".task-inside-container");
+  const description = createHtmlElement(
+    "input",
+    null,
+    ["new-description"],
+    null,
+    [["placeholder", "Description"]]
+  );
+  const taskFooter = createHtmlElement("div", null, ["new-task-footer"], null);
+
+  const leftWrapper = createHtmlElement(
+    "div",
+    null,
+    ["new-task-content-wrapper"],
+    null
+  );
+  const titleBar = document.querySelector(".text-bar");
+  titleBar.setAttribute("placeholder", "Title");
+  titleBar.setAttribute("autofocus", "");
+
+  leftWrapper.append(titleBar, description);
+
+  const dateAndPriorityContainer = createHtmlElement("div", null, [
+    "task-properties-wrapper",
+  ]);
+  dateAndPriorityContainer.append(
+    generateTaskDateElements(),
+    generateTaskPriorityElements()
+  );
+
+  const projectSelection = generateProjectSelectElement();
+  dateAndPriorityContainer.append(projectSelection);
+
+  taskContainer.classList.add("task-container--expand");
+
+  if (container.lastChild === document.querySelector(".text-bar")) {
+    container.append(leftWrapper);
+    taskContainer.appendChild(taskFooter);
+    taskFooter.appendChild(dateAndPriorityContainer);
+
+    const wrapper = createHtmlElement("div", null, ["close-wrapper"]);
+    const close = createHtmlElement("div", null, ["task-close"], "Close");
+    wrapper.appendChild(close);
+
+    taskFooter.append(wrapper);
+  }
 }
 
 function taskPriorityChangeHandler(event) {
@@ -136,13 +186,13 @@ function taskExpandHandler(event) {
   let isTaskExpanded = taskElement.classList.contains("task--expanded");
 
   if (isTaskExpanded) {
-    const newElement = taskGenerator(task);
+    const newElement = generateTaskElement(task);
     taskElement.replaceWith(newElement);
     return;
   }
 
-  const newElement = taskGenerator(task, "expanded");
-  newElement.classList.add("task--expanded");
+  const newElement = generateExpandedTaskElement(task);
+
   taskElement.replaceWith(newElement);
 }
 
@@ -157,7 +207,7 @@ function taskMakeEditableHandler(event) {
   console.log(taskElement);
 
   let task = getTaskById(taskElement.id);
-  let element = taskGenerator(task, "input");
+  let element = generateTaskWithInput(task);
   taskElement.replaceChildren(...element.childNodes);
   taskElement.classList.add("task--expanded");
 

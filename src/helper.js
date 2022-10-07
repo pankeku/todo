@@ -1,8 +1,16 @@
-let id = 0;
+import { formatDistanceToNow, isBefore, parseISO } from "date-fns";
 
-function generateId() {
-    id = id + 1;
-    return id;
+function dueDateChecker(date) {
+  date = parseISO(date);
+
+  if (date == "Invalid Date") return;
+  let result = formatDistanceToNow(date);
+
+  let status = isBefore(date, new Date())
+    ? `${result} overdue`
+    : `due in ${result}`;
+
+  return status;
 }
 
-export {generateId};
+export {dueDateChecker};

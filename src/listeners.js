@@ -62,7 +62,7 @@ export default function loadListeners() {
       markTaskDoneHandler(event);
     }
 
-    if (event.target.className === "newtask-date-picker") {
+    if (event.target.className === "new-task-date-picker") {
       changeTaskDueDateHandler(event);
       updateLocalStorage();
     }
@@ -77,7 +77,7 @@ export default function loadListeners() {
       projectRemoveHandler(event);
     }
 
-    if (event.target.className === "newtask-date") {
+    if (event.target.className === "new-task-date") {
       popUpDatePickerHandler(event);
     }
 
@@ -100,7 +100,7 @@ export default function loadListeners() {
     }
 
     if (
-      event.target.className === "newtask-priority" &&
+      event.target.className === "new-task-priority" &&
       event.target.closest(".task") !== null
     ) {
       taskPriorityChangeHandler(event);

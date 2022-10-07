@@ -41,36 +41,36 @@ body {
   display: flex;
 }
 
-.newtask-left-wrapper {
+.new-task-content-wrapper {
   display: flex;
   width: 80%;
   flex-direction: column;
   gap: 5px;
 }
 
-.newtask-right-wrapper {
+.task-properties-wrapper {
   padding: 5px;
   display: flex;
   flex-direction: row;
   gap: 20px;
 }
 
-.task .newtask-right-wrapper {
+.task .task-properties-wrapper {
   grid-column: 2;
   grid-row: 3;
 }
 
-.newtask-footer {
+.new-task-footer {
   display: flex;
   align-items: center;
 }
 
-.newtask-right-wrapper,
+.task-properties-wrapper,
 .close-wrapper {
   width: 50%;
 }
 
-.newtask-priority {
+.new-task-priority {
   width: 40px;
 }
 
@@ -376,18 +376,18 @@ select:hover {
   font-weight: 700;
 }
 
-.newtask-date-wrapper {
+.task-date-wrapper {
   display: flex;
   gap: 5px;
 }
 
-.newtask-date {
+.new-task-date {
   border: 0px;
   width: 70px;
   text-align: center;
 }
 
-.newtask-date:hover {
+.new-task-date:hover {
   font-weight: 700;
 }
 
@@ -437,7 +437,7 @@ select:hover {
   height: 25px;
 }
 
-.task-left-wrapper {
+.task-content-wrapper {
   grid-row: span 2;
   grid-column: span 2;
   display: flex;
@@ -456,7 +456,7 @@ select:hover {
 }
 
 
-.task-left-wrapper{
+.task-content-wrapper{
 pointer-events: none;
 }
 
@@ -551,7 +551,7 @@ div[id="-2"] .task .task-actions-wrapper {
   display: none;
 }
 
-.newtask-date-picker {
+.new-task-date-picker {
   display: none;
   position: absolute;
   top: 10px;
