@@ -1,7 +1,7 @@
 import { config, priorityBorderColors, priorityColors } from "../config";
 import { dueDateChecker } from "../helper";
-import { getProjectById, getProjectsTitles } from "../Manager";
-import { activeSortOption, activeSortOrder, sortOptions } from "../sorter";
+import { getProjectById, getProjectsTitles, getUpdatedHomeProject } from "../Manager";
+import { activeSortOption, activeSortOrder, sorter, sortOptions } from "../sorter";
 import { activeProject, createHtmlElement } from "../UI";
 
 const content = createHtmlElement("div", null, ["content"], null);
@@ -444,6 +444,34 @@ function clearContentElement() {
   content.replaceChildren();
 }
 
+function updateTasksElement() {
+
+  const projectId = document.querySelector('.project').id;
+  const oldTasks = document.querySelector('.tasks');
+
+   oldTasks.classList.add("project--fading");
+
+   let project;
+
+   if (projectId === '-1') {
+    project = getUpdatedHomeProject();
+  } else {
+    project = getProjectById(projectId);
+  }
+   sorter(project);
+    const tasks = generateTasks(project);
+
+  setTimeout(() => {
+    oldTasks.replaceWith(tasks);
+    tasks.classList.add("project--fading");
+    setTimeout(() => {
+      tasks.classList.remove("project--fading");
+    }, 200);
+  }, 100);
+
+}
+
+
 export {
   render,
   displayProject,
@@ -456,4 +484,6 @@ export {
   generateTaskDateElements,
   generateExpandedTaskElement,
   generateTaskWithInput,
+  generateTasks,
+  updateTasksElement
 };

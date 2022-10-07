@@ -1,13 +1,14 @@
 import { config } from "./config";
 import { updateLocalStorage } from "./localStorage";
 import {
-  getDoneList, getHomeProject, getProjectById, newProject
+  getDoneList,
+  getHomeProject,
+  getProjectById,
+  newProject
 } from "./Manager";
-import { display, update } from "./UI";
-import {
-  changeSortCriteria,
-  changeSortOrder
-} from "./sorter";
+import { changeSortCriteria, changeSortOrder } from "./sorter";
+import { display } from "./UI";
+import { updateTasksElement } from "./ui-modules/content";
 import {
   changeTaskDueDateHandler,
   closingNewTaskBarHandler,
@@ -28,8 +29,6 @@ import {
   taskTitleChangeHandler
 } from "./ui-modules/handlers/contentHandlers";
 import { updateNav } from "./ui-modules/nav";
-
-
 
 export default function loadListeners() {
   let nav = document.querySelector(".nav");
@@ -91,12 +90,12 @@ export default function loadListeners() {
 
     if (event.target.classList.contains("sort-arrow")) {
       changeSortOrder();
-      update();
+      updateTasksElement();
     }
 
     if (event.target.className === "sort-option") {
       changeSortCriteria(event.target);
-      update();
+      updateTasksElement();
     }
 
     if (
@@ -152,14 +151,14 @@ export default function loadListeners() {
   });
 
   content.addEventListener("mouseover", (event) => {
-    if (event.target.className === "task") {
+    if (event.target.classList.contains("task")) {
       taskHoveredCheckboxHandler(event);
     }
   });
 
   content.addEventListener("focusout", (event) => {
     if (event.target.className === "project-title editing") {
-     projectTitleDoneEditingHandler();
+      projectTitleDoneEditingHandler();
     }
   });
 }

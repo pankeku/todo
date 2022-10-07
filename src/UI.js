@@ -1,16 +1,13 @@
 import {
-  getHomeProject,
-  getProjectById,
   getUpdatedHomeProject,
-  projectExists,
-  updateTasks,
+  projectExists
 } from "./Manager";
-import { sorter, activeSortOption, activeSortOrder } from "./sorter";
+import { sorter } from "./sorter";
 import { displayProject, render as renderContent } from "./ui-modules/content";
 import { render as renderHeader } from "./ui-modules/header";
 import { render as renderNav } from "./ui-modules/nav";
 
-let activeProject = [];
+let activeProject;
 
 function initUI() {
   const header = renderHeader();
@@ -35,7 +32,7 @@ function display(project) {
 
   activeProject = project;
 
-  sorter(project, activeSortOption, activeSortOrder);
+  sorter(project);
 
   fadeDisplay(displayProject, project);
 }

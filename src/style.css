@@ -178,6 +178,11 @@ input:focus {
   width: 100px;
 }
 
+.tasks {
+  opacity: 1;
+  transition: opacity 0.3s;
+}
+
 .header {
   height: 40px;
   background-color: black;

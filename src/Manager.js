@@ -1,4 +1,5 @@
 import { config } from "./config";
+import { initDefaultTasks } from "./helper";
 import {
   getDoneProjectFromStorage,
   getProjectsFromStorage,
@@ -7,24 +8,26 @@ import {
 import { createProject, addTask } from "./Project";
 import { createTask } from "./Task";
 import { display, initUI, update } from "./UI";
+import { updateTasksElement } from "./ui-modules/content";
 import { updateNav } from "./ui-modules/nav";
 
 let projects = [];
-let homeProject;
+let allTasksProject;
 let done;
 
 function init() {
+  initDefaultTasks();
   initDefaultProjects();
   initUI();
   updateTasks();
-  display(homeProject);
+  display(allTasksProject);
 }
 
 function runAndUpdate(fun, ...args) {
   fun(...args);
-   updateLocalStorage();
+  updateLocalStorage();
   updateNav();
-  update();
+  updateTasksElement();
 }
 
 function toggleTaskCompletion(task) {
@@ -46,36 +49,36 @@ function toggleTaskCompletion(task) {
 
 function initDefaultProjects() {
   createDoneTasksProject();
-  defaultProject();
+  createAllTasksProject();
   projects = getProjectsFromStorage(projects);
   done = getDoneProjectFromStorage(done);
 }
 
-function defaultProject() {
-  homeProject = newProject("All tasks");
-  homeProject.id = -1;
+function createAllTasksProject() {
+  allTasksProject = newProject(config.allProject.title);
+  allTasksProject.id = config.allProject.id;
 }
 
 function getHomeProject() {
-  return homeProject;
+  return allTasksProject;
 }
 
 function getUpdatedHomeProject() {
   updateTasks();
-  return homeProject;
+  return allTasksProject;
 }
 
 function updateTasks() {
-  homeProject.tasks = homeProject.tasks.filter((task) => {
+  allTasksProject.tasks = allTasksProject.tasks.filter((task) => {
     const project = getProjectById(task.project);
-    if (project) return project.title === homeProject.title;
+    if (project) return project.title === allTasksProject.title;
     return false;
   });
-  homeProject.tasks = homeProject.tasks.concat(getAllTasks());
+  allTasksProject.tasks = allTasksProject.tasks.concat(getAllTasks());
 }
 
 function createDoneTasksProject() {
-  done = createProject("Done");
+  done = createProject(config.done.title);
   done.id = config.done.id;
 }
 
@@ -124,13 +127,15 @@ function getTaskById(id, project) {
   }
 
   let found;
-  projects.filter(project => project.id !== -1).forEach((project) => {
-    project.tasks.forEach((task) => {
-      if (task.id === id) {
-        found = task;
-      }
+  projects
+    .filter((project) => project.id !== -1)
+    .forEach((project) => {
+      project.tasks.forEach((task) => {
+        if (task.id === id) {
+          found = task;
+        }
+      });
     });
-  });
   if (!found) {
     found = done.tasks.find((task) => task.id == id);
   }
@@ -174,7 +179,7 @@ function getProjectById(id) {
 function getAllTasks() {
   let array = [];
   projects
-    .filter((project) => project.title !== homeProject.title)
+    .filter((project) => project.title !== allTasksProject.title)
     .forEach((project) => {
       array = array.concat(project.tasks);
     });
@@ -189,7 +194,7 @@ function getProjectIndex(project) {
 function getProjectsAndTitles() {
   let titles = [];
   projects
-    .filter((project) => project.id !== homeProject.id)
+    .filter((project) => project.id !== allTasksProject.id)
     .forEach((project) => {
       const obj = {};
       obj[project.title] = project.id;

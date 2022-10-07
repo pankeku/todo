@@ -2,8 +2,13 @@ let config = {
     page: {
         title: 'Tasks',
     },
+    allProject: {
+      title: 'All tasks',
+      id: -1
+    }
+    ,
     done: {
-      title: '',
+      title: 'Completed tasks',
       id: -2,
     },
     priorities: ["P1", "P2", "P3", "P4"],

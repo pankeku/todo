@@ -4,32 +4,32 @@ let sortOptions = ["name", "priority", "date", "project"];
 let activeSortOption = "name";
 let activeSortOrder = "ascending";
 
-function sorter(project, setting, order) {
+function sorter(project) {
   project.tasks.sort((a, b) => {
     let titleA;
     let titleB;
 
-    if (setting === "name") {
+    if (activeSortOption === "name") {
       titleA = a["title"].toUpperCase();
       titleB = b["title"].toUpperCase();
     }
 
-    if (setting === "priority") {
+    if (activeSortOption === "priority") {
       titleA = a["priority"];
       titleB = b["priority"];
     }
 
-    if (setting === "date") {
+    if (activeSortOption === "date") {
       titleA = a["dueDate"];
       titleB = b["dueDate"];
     }
 
-    if (setting === "project") {
+    if (activeSortOption === "project") {
       titleA = getProjectById(a.project).title.toUpperCase();
       titleB = getProjectById(b.project).title.toUpperCase();
     }
 
-    if (order == "descending") {
+    if (activeSortOrder == "descending") {
       const temp = titleA;
       titleA = titleB;
       titleB = temp;

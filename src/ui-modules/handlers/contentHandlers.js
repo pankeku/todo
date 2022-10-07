@@ -4,7 +4,6 @@ import {
   getProjectById,
   getTaskById,
   moveTask,
-  projects,
   removeProject,
   removeTask,
   runAndUpdate,
@@ -21,6 +20,7 @@ import {
   generateTaskDateElements,
   generateExpandedTaskElement,
   generateTaskWithInput,
+  expandNewTask,
 } from "../content";
 import { updateNav } from "../nav";
 
@@ -76,14 +76,25 @@ function popUpDatePickerHandler(event) {
   newDate.showPicker();
 }
 
-function closingNewTaskBarHandler(event) {
+function closingNewTaskBarHandler() {
   const description = document.querySelector(".new-description");
   let newTaskBar = document.querySelector(".text-bar");
   const dueDate = document.querySelector(".new-task-date");
   const priority = document.querySelector(".new-task-priority");
   const projectSelector = document.querySelector(".project-select");
 
-  if (newTaskBar.value !== "" || description.value !== "") {
+  if (newTaskBar.value == "" && description.value !== "") {
+    runAndUpdate(
+      addNewTask,
+      projectSelector.options[projectSelector.selectedIndex].id,
+      description.value,
+      newTaskBar.value,
+      dueDate.value,
+      priority.value
+    );
+  }
+
+  if (newTaskBar.value !== "") {
     runAndUpdate(
       addNewTask,
       projectSelector.options[projectSelector.selectedIndex].id,
@@ -92,8 +103,6 @@ function closingNewTaskBarHandler(event) {
       dueDate.value,
       priority.value
     );
-
-    return;
   }
 
   const taskContainer = document.querySelector(".task-container");
@@ -102,7 +111,6 @@ function closingNewTaskBarHandler(event) {
 }
 
 function expandingNewTaskBarHandler(event) {
-  event.target.classList.add("open");
   let taskContainer = document.querySelector(".task-container");
   let container = document.querySelector(".task-inside-container");
   const description = createHtmlElement(
@@ -124,6 +132,8 @@ function expandingNewTaskBarHandler(event) {
   titleBar.setAttribute("placeholder", "Title");
   titleBar.setAttribute("autofocus", "");
 
+  titleBar.classList.add("open");
+
   leftWrapper.append(titleBar, description);
 
   const dateAndPriorityContainer = createHtmlElement("div", null, [
@@ -140,6 +150,7 @@ function expandingNewTaskBarHandler(event) {
   taskContainer.classList.add("task-container--expand");
 
   if (container.lastChild === document.querySelector(".text-bar")) {
+
     container.append(leftWrapper);
     taskContainer.appendChild(taskFooter);
     taskFooter.appendChild(dateAndPriorityContainer);
@@ -150,6 +161,8 @@ function expandingNewTaskBarHandler(event) {
 
     taskFooter.append(wrapper);
   }
+
+  return taskContainer;
 }
 
 function taskPriorityChangeHandler(event) {
@@ -157,8 +170,6 @@ function taskPriorityChangeHandler(event) {
   const task = getTaskById(taskElement.id);
 
   task.priority = event.target.value;
-  console.log(task.priority);
-  console.log(projects);
 
   let checkbox = taskElement.querySelector('input[type="checkbox"]');
 
@@ -171,6 +182,7 @@ function taskAssignedProjectChangeHandler(event) {
   const task = getTaskById(taskElement.id);
   const newProjectId =
     event.target.options[event.target.options.selectedIndex].id;
+
   runAndUpdate(moveTask, task, newProjectId);
 }
 
