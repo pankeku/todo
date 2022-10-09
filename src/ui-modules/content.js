@@ -76,8 +76,17 @@ function generateProjectElement(project) {
 
   projectElement.appendChild(headerWrapper);
 
-  //as paskaites apie single-responsibility ir dependency inversion, ir biski apie composition, vis galvoju, kad tokius zemiau esancius metodus reiktu callint is isores, kad pvz. cia generateProjectElement() nebutu priklausomas nuo situ dvieju metodu. Ideja tokia, kad tiems dviems metodams passinu projectElement, kuri dabar generateProjectElement() returnina. Tada passintam parente pagal savo vidine logika jie susirastu ko jiems reikia ir patys pridetu savo elementus. Arba vapse jiems nieko nepassinu, tada kai buna pacallinti, jie susiranda parentElement per querySelector ir visi metodai gyvena sau atskirai ir laimingai.
-  //bet tada atrodo daaaug daugiau kodo bus, ir, kas man atrodo svarbu, daug daugiau resursu isnaudota bus, nors as srity performance vs maintanable and readable code nesigaudau :D ka manai?
+  // as paskaites apie single-responsibility ir dependency inversion, ir biski apie composition, vis galvoju,
+  // kad tokius zemiau esancius metodus reiktu callint is isores, kad pvz. cia generateProjectElement()
+  // nebutu priklausomas nuo situ dvieju metodu. Ideja tokia, kad tiems dviems metodams passinu projectElement,
+  // kuri dabar generateProjectElement() returnina. Tada passintam parente pagal savo vidine logika jie susirastu
+  // ko jiems reikia ir patys pridetu savo elementus. Arba vapse jiems nieko nepassinu, tada kai buna pacallinti,
+  // jie susiranda parentElement per querySelector ir visi metodai gyvena sau atskirai ir laimingai.
+
+  // bet tada atrodo daaaug daugiau kodo bus, ir, kas man atrodo svarbu, daug daugiau resursu isnaudota bus, nors as
+  // srity performance vs maintanable and readable code nesigaudau :D ka manai?
+
+  // COMMENT: siaip dabartinis variantas nera blogai, jeigu tos funkcijos yra kind of `helper` funkcijos, kurios veikia on demand sitos funkcijos. Bet gali pabandyt pazaist ir su composition. Dependency inversion yra sudetingas konceptas. Pats ji tik magistre mokintis pradejau ir to be fair. Javascripte jo visiskai nereikia :D
 
   addProjectTitleEditElement(titleWrapper);
   addProjectRemoveElement(titleWrapper);
